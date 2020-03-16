@@ -1,78 +1,22 @@
 package pro.it.sis.javacourse;
 
-public class Target{
+public class Target {
 
-    private boolean         alive;
-    private long            healthPoint;
-    private final String    immunity;
-    private final String    name;
-
-    public Target(){
-        this.name           = "Цель - пустышка";
-        this.alive          = false;
-        this.healthPoint    = 0;
-        this.immunity       = "";
+    public int getPhysicalDamage() {
+        return physicalDamage;
     }
 
-    public Target(TargetFactory.targetTypes type, long healthPoint, TargetFactory.immunityTypes immunity){
-
-        this.name           = type.name();
-        this.healthPoint    = healthPoint;
-        this.immunity       = immunity.toString();
-        this.alive          = healthPoint > 0;
+    public int getFireDamage() {
+        return fireDamage;
     }
 
-    public long getHealthPoint(){
-        return healthPoint;
+    public int getIceDamage() {
+        return iceDamage;
     }
 
-    public String getImmunity(){
-        return immunity;
-    }
+    private int physicalDamage;
 
-    public String getName() {
-        return name;
-    }
+    private int fireDamage;
 
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void raise(long XP){
-        healthPoint = XP;
-        alive       = true;
-    }
-
-    public void receiveDamage(Damage damage){
-
-        if(!isAlive()){
-            System.out.println(this.name + ":" + "\tТо что мертво, умереть не может");
-            return;
-        }
-
-        //Урон с учетом имунитета
-        long totalDamage;
-        switch (immunity){
-            case("fire"):
-                totalDamage = damage.getPhys() + damage.getIce();
-                break;
-            case("ice"):
-                totalDamage = damage.getPhys() + damage.getFire();
-                break;
-            default:
-                totalDamage = damage.getPhys() + damage.getFire() + damage.getIce();
-                break;
-        }
-
-        healthPoint -= totalDamage;
-        if(healthPoint <= 0) {
-            System.out.println(this.name + ":"  + "\tУбит оружием: \t" + damage.getArmName());
-            alive = false;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "name: " + name + ";\talive: " + isAlive() + ";\tXP:" + healthPoint;
-    }
+    private int iceDamage;
 }
