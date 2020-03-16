@@ -15,7 +15,12 @@ public class Unit1 {
      * При реализации метода нельзя использовать метод reverse() из класса StringBuilder
      */
     private static String revertString() {
-        return "";
+        int len = INPUT_STRING.length();
+        char[] buf = new char[len];
+        for(int c = 0; c < len; c++){
+            buf[len - c - 1] = INPUT_STRING.charAt(c);
+        }
+        return new String(buf);
     }
 
     private static void checkResult(String result) {
