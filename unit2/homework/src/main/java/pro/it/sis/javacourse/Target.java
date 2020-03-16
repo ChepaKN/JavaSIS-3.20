@@ -13,13 +13,13 @@ public class Target{
         this.healthPoint    = 0;
         this.immunity       = "";
     }
-    public Target(String name, long healthPoint, String immunity){
-        this.name           = name;
-        this.healthPoint    = healthPoint;
-        this.immunity       = immunity;
 
-        if(healthPoint > 0) this.alive = true;
-        else this.alive     = false;
+    public Target(TargetFactory.targetTypes type, long healthPoint, TargetFactory.immunityTypes immunity){
+
+        this.name           = type.name();
+        this.healthPoint    = healthPoint;
+        this.immunity       = immunity.toString();
+        this.alive          = healthPoint > 0;
     }
 
     public long getHealthPoint(){
@@ -30,8 +30,8 @@ public class Target{
         return immunity;
     }
 
-    public String getName(){
-        return  name;
+    public String getName() {
+        return name;
     }
 
     public boolean isAlive() {
@@ -51,7 +51,7 @@ public class Target{
         }
 
         //Урон с учетом имунитета
-        long totalDamage = 0;
+        long totalDamage;
         switch (immunity){
             case("fire"):
                 totalDamage = damage.getPhys() + damage.getIce();
@@ -73,8 +73,6 @@ public class Target{
 
     @Override
     public String toString() {
-        String string = "name: " + name + ";\talive: " + isAlive() + ";\tXP:" + healthPoint;
-        return string;
+        return "name: " + name + ";\talive: " + isAlive() + ";\tXP:" + healthPoint;
     }
 }
-

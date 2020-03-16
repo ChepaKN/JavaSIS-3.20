@@ -5,23 +5,20 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class TargetTest {
-    String name = "Some target";
-    long HP     = 500;
-
     @Test
     public void testWeaponName() {
-        Target target = new Target(name, HP, "");
-        assertEquals(name, target.getName());
+        Target target =  TargetFactory.createTarget(TargetFactory.targetTypes.SHREK);
+        assertEquals(TargetFactory.targetTypes.SHREK.toString(), target.getName());
     }
     @Test
     public void testImmunityType(){
-        Target target = new Target(name, HP, "ice");
-        assertEquals("ice", target.getImmunity());
+        Target target =  TargetFactory.createTarget(TargetFactory.targetTypes.SHREK);
+        assertEquals(TargetFactory.immunityTypes.ICE.toString(), target.getImmunity());
     }
     @Test
     public void testHP(){
-        Target target = new Target(name, HP, "");
-        assertEquals(HP, target.getHealthPoint());
+        Target target =  TargetFactory.createTarget(TargetFactory.targetTypes.SHREK);
+        assertEquals(900, target.getHealthPoint());
     }
 
 

@@ -5,24 +5,29 @@ import java.util.List;
 
 public class Main{
 
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
+        try {
+            // write your code here
+            List<Target> targets = new ArrayList<>();
+            targets.add(TargetFactory.createTarget(TargetFactory.targetTypes.SHREK));
+            targets.add(TargetFactory.createTarget(TargetFactory.targetTypes.PRINCE));
 
-        // Сценарий битвы
-        List<Weapon> swords = new ArrayList<>();
-        swords.add(new Weapon("YakutskNightSword", 100, 50, 0));
-        swords.add(new Weapon("FlameAsphaltSword", 100, 0, 50));
+            List<Weapon> swords = new ArrayList<>();
+            swords.add(WeaponFactory.createWeapon(WeaponFactory.weaponTypes.YAKUTSK_NIGHT_SWORD));
+            swords.add(WeaponFactory.createWeapon(WeaponFactory.weaponTypes.FLAME_ASPHALT_SWORD));
 
-        List<Target> targets = new ArrayList<>();
-        targets.add(new Target("Shrek", 900, "ice"));
-        targets.add(new Target("Prince", 700, ""));
-
-        for(Weapon w : swords) {
-            for (Target t : targets) {
-                while (t.isAlive()) {
-                    System.out.println(t.toString());
-                    t.receiveDamage(swords.get(0).hurt());
-                }t.raise(1000);
+            for (Weapon s : swords) {
+                for (Target t : targets) {
+                    while (t.isAlive()) {
+                        System.out.println(t.toString());
+                        t.receiveDamage(s.hurt());
+                    }
+                    t.raise(1000);
+                }
             }
+        }catch (Exception NullPointerException){
+            NullPointerException.printStackTrace();
+            System.out.println("Несуществующий тип Оружия или Цели!");
         }
     }
 }

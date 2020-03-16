@@ -5,18 +5,15 @@ public class Weapon  {
 
     private final String    name;
     private final Damage    damage;
-    private boolean         readyToWar;
 
-    public Weapon(String name, long phys, long fire, long ice) {
-        this.name   = name;
-        this.damage = new Damage(name, phys, fire, ice);
-        readyToWar = true;
+    public Weapon(WeaponFactory.weaponTypes name, long phys, long fire, long ice) {
+        this.name   = name.name();
+        this.damage = new Damage(name.name(), phys, fire, ice);
     }
 
     public Weapon() {
-        this.name   = "Безобидный перочинынй нож";
+        this.name   = "Безобидный перочинный нож";
         this.damage = new Damage("", 0,0,0);
-        readyToWar = false;
     }
 
     //Элемент "Случайности"
@@ -39,10 +36,9 @@ public class Weapon  {
     //нанести урон
     public Damage hurt(){
         long totalPhysDamage  = 0;
-        if(isReadyToWar()){
+        if(damage.getPhys() > 0){
             totalPhysDamage = damage.getPhys() + getRandDamage() + getCriticalDamage();
         }
-        //иначе урон 0
         return new Damage(name, totalPhysDamage , damage.getFire(), damage.getIce());
     }
 
@@ -50,16 +46,14 @@ public class Weapon  {
         return name;
     }
 
+    public Damage getDamage() {
+        return damage;
+    }
+
     @Override
     public String toString() {
         return name + "\t" + damage.toString();
     }
 
-    public boolean isReadyToWar() {
-        return readyToWar;
-    }
 
-    public Damage getDamage() {
-        return damage;
-    }
 }

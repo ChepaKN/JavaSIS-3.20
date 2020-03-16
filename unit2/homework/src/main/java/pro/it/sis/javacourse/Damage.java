@@ -4,39 +4,38 @@ package pro.it.sis.javacourse;
 public class Damage {
 
     private final String armName;
-    private final long phys;
-    private final long fire;
-    private final long ice;
+    private final long physDamage;
+    private final long fireDamage;
+    private final long iceDamage;
 
     public Damage(String armName, long phys, long fire, long ice){
-        this.armName = armName;
-        this.phys   = phys;
-        this.fire   = fire;
-        this.ice    = ice;
+        this.armName      = armName;
+        this.physDamage   = phys;
+        this.fireDamage   = fire;
+        this.iceDamage    = ice;
     }
 
     public Damage(){
-        this.armName = "";
-        this.phys   = 0;
-        this.fire   = 0;
-        this.ice    = 0;
+        this.armName        = "";
+        this.physDamage     = 0;
+        this.fireDamage     = 0;
+        this.iceDamage      = 0;
     }
     public long getPhys() {
-        return phys;
+        return physDamage;
     }
 
     public long getFire() {
-        return fire;
+        return fireDamage;
     }
 
     public long getIce() {
-        return ice;
+        return iceDamage;
     }
 
     @Override
     public String toString() {
-        String string = "Arm Name:\t" + getArmName() + "\tPhysical: " + phys + "\tFire: " + fire + "\tIce: " + ice;
-        return string;
+        return "Arm Name:\t" + getArmName() + "\tPhysical: " + physDamage + "\tFire: " + fireDamage + "\tIce: " + iceDamage;
     }
 
     public String getArmName() {
