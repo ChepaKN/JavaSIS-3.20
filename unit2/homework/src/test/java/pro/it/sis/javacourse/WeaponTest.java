@@ -1,32 +1,40 @@
 package pro.it.sis.javacourse;
 
 import org.junit.Test;
+
+import java.nio.file.Watchable;
+
 import static org.junit.Assert.*;
 
 public class WeaponTest {
-    String name     = "FLAME_ASPHALT_SWORD";
-    long physDamage = 100;
-    long fireDamage = 50;
-    long iceDamage  = 0;
 
     @Test
-    public void testWeaponName() {
-        Weapon weapon = WeaponFactory.createWeapon(WeaponFactory.weaponTypes.FLAME_ASPHALT_SWORD);
-        assertEquals(name, weapon.getName());
+    public void testPhysicalDamage() {
+
+        Target t = new Target();
+        Weapon w = new Weapon();
+        w.hit(t);
+
+        assertEquals(100, t.getPhysicalDamage());
     }
+
     @Test
-    public void testWeaponPhysDamage(){
-        Weapon weapon = WeaponFactory.createWeapon(WeaponFactory.weaponTypes.FLAME_ASPHALT_SWORD);
-        assertEquals(physDamage, weapon.getDamage().getPhys());
+    public void testFireDamage() {
+
+        Target t = new Target();
+        Weapon w = new Weapon();
+        w.hit(t);
+
+        assertEquals(100, t.getFireDamage());
     }
+
     @Test
-    public void testWeaponIceDamage(){
-        Weapon weapon = WeaponFactory.createWeapon(WeaponFactory.weaponTypes.FLAME_ASPHALT_SWORD);
-        assertEquals(fireDamage, weapon.getDamage().getIce());
-    }
-    @Test
-    public void testWeaponFireDamage(){
-        Weapon weapon = WeaponFactory.createWeapon(WeaponFactory.weaponTypes.FLAME_ASPHALT_SWORD);
-        assertEquals(iceDamage, weapon.getDamage().getFire());
+    public void testIceDamage() {
+
+        Target t = new Target();
+        Weapon w = new Weapon();
+        w.hit(t);
+
+        assertEquals(100, t.getIceDamage());
     }
 }
