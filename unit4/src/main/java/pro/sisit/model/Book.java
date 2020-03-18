@@ -1,15 +1,19 @@
 package pro.sisit.model;
 
+import pro.sisit.adapter.CSV_converter;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public class Book {
+public class Book implements CSV_converter {
 
     private String name;
     private String author;
     private String genre;
     private String isbn;
 
-    public Book(){
+    public  Book(){
 
     }
 
@@ -60,4 +64,23 @@ public class Book {
     public String toString(){
         return  name +"\t"+  author +"\t"+ genre +"\t"+ isbn;
     }
+
+    @Override
+    public List<String> fromFieldsToCSV() {
+        List<String> fields = new ArrayList<>();
+        fields.add(name);
+        fields.add(author);
+        fields.add(genre);
+        fields.add(isbn);
+        return fields;
+    }
+
+    @Override
+    public void fromCSVToFields(List<String> fromCSV) {
+        name    = fromCSV.get(0);
+        author  = fromCSV.get(1);
+        genre   = fromCSV.get(2);
+        isbn    = fromCSV.get(3);
+    }
+
 }

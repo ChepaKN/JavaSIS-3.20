@@ -1,6 +1,7 @@
 package pro.sisit.adapter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -15,6 +16,9 @@ import  pro.sisit.model.*;
 // TODO: 2. Описать тестовые кейсы
 
 public class CSVAdapterTest {
+
+    public CSVAdapterTest() throws IOException {
+    }
 
     @Before
     public void createFile() throws IOException {
@@ -89,11 +93,33 @@ public class CSVAdapterTest {
 
            Book actualBook0 = bookCsvAdapter.read(0);
            assertEquals(expectedBook0, actualBook0);
-           // TODO: написать тесты для проверки сущности автора
        } catch (IOException | IllegalAccessException | InstantiationException e) {
            e.printStackTrace();
        }
+
+           // TODO: написать тесты для проверки сущности автора
+           Path authorFilePath = Paths.get("authors.csv");
+
+           try( BufferedReader authorReader = new BufferedReader(new FileReader(authorFilePath.toFile()));
+                BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
+
+                CSVAdapter<Author> authorCsvAdapter = new CSVAdapter(Author.class, authorReader, authorWriter, ";");
+
+                Author author1 = authorCsvAdapter.read(0);
+
+                assertEquals("Булгаков", author1.getName());
+                assertEquals("Нью-йорк", author1.getBirthPlace());
+
+                Author expectedAuthor = new Author("Булгаков", "Нью-йорк");
+                Author actualAuthor = authorCsvAdapter.read(0);
+                assertTrue(expectedAuthor.equals(actualAuthor));
+
+            } catch (IOException | IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+
     }
+
 
     @Test
     public void testAppend()  {
@@ -114,6 +140,7 @@ public class CSVAdapterTest {
             int bookIndex = bookCsvAdapter.append(newBook);
             Book bookAtIndex = bookCsvAdapter.read(bookIndex);
             assertEquals(newBook, bookAtIndex);
+
         } catch (IllegalAccessException | IOException | InstantiationException e) {
             e.printStackTrace();
         }
