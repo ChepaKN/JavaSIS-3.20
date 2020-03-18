@@ -1,5 +1,6 @@
 package pro.sisit.model;
 
+
 import java.util.Objects;
 
 public class Author {
@@ -10,6 +11,10 @@ public class Author {
     public Author(String name, String birthPlace) {
         this.name = name;
         this.birthPlace = birthPlace;
+    }
+
+    public Author(){
+
     }
 
     public String getName() {
@@ -30,11 +35,17 @@ public class Author {
         }
         Author author = (Author) o;
         return getName().equals(author.getName()) &&
-            getBirthPlace().equals(author.getBirthPlace());
+                getBirthPlace().equals(author.getBirthPlace());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getBirthPlace());
     }
+
+    @Override
+    public String toString(){
+        return name + "\t" + birthPlace;
+    }
+
 }

@@ -9,6 +9,10 @@ public class Book {
     private String genre;
     private String isbn;
 
+    public Book(){
+
+    }
+
     public Book(String name, String author, String genre, String isbn) {
         this.name = name;
         this.author = author;
@@ -42,13 +46,18 @@ public class Book {
         }
         Book book = (Book) o;
         return getName().equals(book.getName()) &&
-            getAuthor().equals(book.getAuthor()) &&
-            getGenre().equals(book.getGenre()) &&
-            getIsbn().equals(book.getIsbn());
+                getAuthor().equals(book.getAuthor()) &&
+                getGenre().equals(book.getGenre()) &&
+                getIsbn().equals(book.getIsbn());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getAuthor(), getGenre(), getIsbn());
+    }
+
+    @Override
+    public String toString(){
+        return  name +"\t"+  author +"\t"+ genre +"\t"+ isbn;
     }
 }
