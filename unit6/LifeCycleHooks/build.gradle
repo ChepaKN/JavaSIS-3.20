@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'pro.sisit.javacourse.lifecyclehooks'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework:spring-context:5.1.4.RELEASE'
+}
+
+application {
+    mainClassName = 'pro.sisit.javacourse.lifecyclehooks.LifeCycleHooksDemoApplication'
+}

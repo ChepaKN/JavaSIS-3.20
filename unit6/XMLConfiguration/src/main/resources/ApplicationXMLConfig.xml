@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.springframework.org/schema/beans"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="PetServiceCat"
+      class="pro.sisit.javacourse.xmlconfig.CatShop" primary="true" >
+        <constructor-arg type="pro.sisit.javacourse.xmlconfig.Toy" ref="toy" />
+    </bean>
+    <bean id="PetServiceDog" class="pro.sisit.javacourse.xmlconfig.DogShop" />
+    <bean name="toy" class="pro.sisit.javacourse.xmlconfig.Toy">
+        <constructor-arg name="name" value="mouse" />
+    </bean>
+</beans>
