@@ -7,9 +7,7 @@ import pro.sisit.javacourse.optimal.Transport;
 
 import javax.crypto.spec.PSource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PathFinder {
@@ -19,44 +17,46 @@ public class PathFinder {
      * Если deliveryTask равна null, то оптимальеый транспорт тоже равен null.
      * Если список transports равен null, то оптимальеый транспорт тоже равен null.
      */
-    //Return optional!
     public Transport getOptimalTransport(DeliveryTask deliveryTask, List<Transport> transports) {
         // ToDo: realize me!
-        try {
 
-            if(deliveryTask == null) return null;
-            if(transports == null) return null;
+        if (deliveryTask == null) return null;
+        if (transports == null) return null;
 
-            //Тип транспорта, разрешенный для данного груза
-            List<RouteType> availableRoutesType =  deliveryTask.getRoutes()
-                                                                .stream()
-                                                                .map(Route::getType)
-                                                                .collect(Collectors.toList());
+        //Тип маршрута, разрешенный для данного груза
+        List<RouteType> availableRoutesType = deliveryTask.getRoutes()
+                .stream()
+                .map(Route::getType)
+                .collect(Collectors.toList());
 
+//        List<Optional<Transport>> listT =  transports.stream()
+//                .map(Optional::of)
+//                .filter(transport -> availableRoutesType.contains(transport.getType()))                 //Фильтрация по типу
+//                .filter(transport -> transport.getVolume().compareTo(deliveryTask.getVolume()) >= 0)    //Фильтрация по объему
+//                .collect(Collectors.toList());
 
+        //Скопируем тот транспорт, который подходит для  данного груза
+        List<Transport> availableTransport = transports.stream()
+                .filter(transport -> availableRoutesType.contains(transport.getType()))                 //Фильтрация по типу
+                .filter(transport -> transport.getVolume().compareTo(deliveryTask.getVolume()) >= 0)    //Фильтрация по объему
+                .collect(Collectors.toList());
 
-            //todo: как бы  переделать на стрим...
-            //Скопируем тот транспорт, который подходит для  данного груза
-            List<Transport> availableTransport = new ArrayList<>();
-            for(Transport t : transports){
-                if(availableRoutesType.contains(t.getType())){
-                    availableTransport.add(t);
-                }
-            }
+        //Не нашлось подходящего транспорта
+        if(availableTransport.isEmpty()) return null;
 
-            //Не нашлось подходящего транспорта
-            if(availableTransport.isEmpty()) return null;
-
-            //Отсортируем коллекцию по цене
-            List<Transport> sortedTransport = availableTransport.stream()
-                    .sorted(Comparator.comparing(Transport::getPrice))
-                    .collect(Collectors.toList());
-
-            return sortedTransport.get(0);
-
-
-        }catch (Exception e){
+        //Упакуем в map, чтобы удабно было узнать длину маршрута для заданного типа по ключу RouteType
+        Map<RouteType, BigDecimal> routesMap = new HashMap<>();
+        for (Route r : deliveryTask.getRoutes()) {
+            routesMap.put(r.getType(), r.getLength());
         }
-        return null;
+
+        //Отсортируем коллекцию по критерию "lenght * price"
+        List<Transport> sortedTransport = availableTransport.stream()
+                .sorted(Comparator.comparing(o -> o.getPrice().multiply(routesMap.get(o.getType()))))
+                .collect(Collectors.toList());
+
+        //todo: Прикрутить Optional...
+
+        return  sortedTransport.get(0);
     }
 }
