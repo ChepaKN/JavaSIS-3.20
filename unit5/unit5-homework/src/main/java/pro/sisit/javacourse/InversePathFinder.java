@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Comparator.comparing;
-
 public class InversePathFinder {
 
     /**
@@ -35,7 +33,9 @@ public class InversePathFinder {
         // ToDo: realize me!
 
         List<Solution> solutions = new ArrayList<>();
-        if((task == null) || (task.getTasks() == null) || (task.getTransports() == null) ||(task.getPriceRange() == null)) return solutions;
+        if ((task == null) || (task.getTasks() == null) || (task.getTransports() == null) || (task.getPriceRange() == null)){
+            return solutions;
+        }
 
         //Список решенных задач
         List<DeliveryTask> deliveryTasks = task.getTasks();
@@ -46,52 +46,63 @@ public class InversePathFinder {
         //Диапазон затрат
         BigDecimalRange range = task.getPriceRange();
 
-        DeliveryTask deliveryTask = null;
+        //todo: как бы тут прикрутить стрим...
+        for (DeliveryTask deliveryTask : deliveryTasks) {
 
-        for(DeliveryTask d : deliveryTasks) {
+            Map<RouteType, BigDecimal> routesMap = routesToMap(deliveryTask);
+            List<Transport> availableTransport = getAvailableTransport(deliveryTask, transports, range);
 
-            deliveryTask = d;
+            //Добавим в коллекцию все решения
+            if (availableTransport.size() > 0) {
+                for (Transport t : availableTransport) {
+                    solutions.add(new Solution(deliveryTask, t, t.getPrice().multiply(routesMap.get(t.getType()))));
+                }
+            }
+        }
 
+        //Сортируем список
+        Comparator<Solution> solutionComparator = Comparator.comparing(Solution::getPrice).reversed().
+                thenComparing(solution -> solution.getDeliveryTask().getName());
+
+        solutions = solutions.stream()
+                .sorted(solutionComparator)
+                .collect(Collectors.toList());
+
+        return solutions;
+
+    }
+
+    private Map<RouteType, BigDecimal> routesToMap(DeliveryTask deliveryTask){
             //Упакуем в map, чтобы удабно было узнать длину маршрута для заданного типа по ключу RouteType
             Map<RouteType, BigDecimal> routesMap = new HashMap<>();
             for (Route r : deliveryTask.getRoutes()) {
                 routesMap.put(r.getType(), r.getLength());
             }
-
-            //Тип маршрута, разрешенный для данного груза
-            List<RouteType> availableRoutesType = deliveryTask.getRoutes()
-                    .stream()
-                    .map(Route::getType)
-                    .collect(Collectors.toList());
-
-            //Скопируем тот транспорт, который подходит для  данной задачи
-            DeliveryTask finalDeliveryTask = deliveryTask;
-            List<Transport> availableTransport = transports.stream()
-                    .filter(transport -> availableRoutesType.contains(transport.getType()))                                     //Фильтрация по типу
-                    .filter(transport -> transport.getVolume().compareTo(finalDeliveryTask.getVolume()) >= 0)                        //Фильтрация по объему
-                    .filter(transport -> range.inRange(transport.getPrice().multiply(routesMap.get(transport.getType()))))      //Фильтрация по цене
-                    .collect(Collectors.toList());
+            return routesMap;
+    }
 
 
-            //Отсортируем коллекцию транспорта по критерию "lenght * price"
-            List<Transport> sortedTransport = availableTransport.stream()
-                    .sorted(comparing(o -> o.getPrice().multiply(routesMap.get(o.getType()))))
-                    .collect(Collectors.toList());
-
-            //Добавим в коллекцию решений
-            Transport optimalTransport = sortedTransport.get(0);
-            BigDecimal totalPrice = optimalTransport.getPrice().multiply(routesMap.get(optimalTransport.getType()));
-            solutions.add(new Solution(deliveryTask, optimalTransport, totalPrice));
-
-        }
-
-        //Сортируем список
-        solutions = solutions.stream().sorted(comparing(Solution::getPrice)).collect(Collectors.toList());
+    private List<RouteType> getAvailableRoutesType(DeliveryTask deliveryTask) {
+        return deliveryTask.getRoutes()
+                .stream()
+                .map(Route::getType)
+                .collect(Collectors.toList());
+    }
 
 
-        int bb = 0;
+    private List<Transport> getAvailableTransport(DeliveryTask task, List<Transport> transports, BigDecimalRange range) {
 
+        List<RouteType> availableRoutesType = getAvailableRoutesType(task);
+        Map<RouteType, BigDecimal> routesMap = routesToMap(task);
 
-        return solutions;
+        return transports.stream()
+                .filter(transport -> availableRoutesType.contains(transport.getType()))                                     //Фильтрация по типу
+                .filter(transport -> transport.getVolume().compareTo(task.getVolume()) >= 0)                                //Фильтрация по объему
+                .filter(transport -> range.inRange(transport.getPrice().multiply(routesMap.get(transport.getType()))))      //Фильтрация по цене
+                .collect(Collectors.toList());
+
     }
 }
+
+
+

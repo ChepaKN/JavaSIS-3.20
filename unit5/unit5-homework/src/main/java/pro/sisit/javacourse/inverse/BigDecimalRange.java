@@ -208,31 +208,32 @@ public class BigDecimalRange {
     }
 
     public boolean inRange(BigDecimal value){
-        boolean toReturn = true;
-        //Левая граница
-        if(!isLeftStrict || isLeftOpen){
-            //Нестрогая
-            if(value.compareTo(left) < 0){
-                return false;
-            }
-        }else{
-            //Строгая
-            if(value.compareTo(left) <= 0){
-                return false;
+
+        //Проверяем левую границу
+        if(!isLeftOpen){
+            if(!isLeftStrict){
+                if(value.compareTo(left) < 0){
+                    return false;
+                }
+            }else{
+                if(value.compareTo(left) <= 0){
+                    return false;
+                }
             }
         }
-        //Правая граница
-        if(!isRightStrict || isRightOpen){
-            //Нестрогая
-            if(value.compareTo(right) > 0){
-                return false;
-            }
-        }else{
-            //Строгая
-            if(value.compareTo(right) >= 0){
-                return false;
+        //Проверяем правую границу
+        if(!isRightOpen){
+            if(!isRightStrict){
+                if(value.compareTo(right) > 0){
+                    return false;
+                }
+            }else{
+               if(value.compareTo(right) >= 0){
+                   return false;
+               }
             }
         }
         return true;
     }
+
 }
