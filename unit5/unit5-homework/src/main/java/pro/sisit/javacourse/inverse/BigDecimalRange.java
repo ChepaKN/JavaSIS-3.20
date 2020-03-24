@@ -206,4 +206,34 @@ public class BigDecimalRange {
     public static BigDecimalRange infinityRange() {
         return new BigDecimalRange(null, true, null, true);
     }
+
+    public boolean inRange(BigDecimal value){
+
+        //Проверяем левую границу
+        if(!isLeftOpen){
+            if(!isLeftStrict){
+                if(value.compareTo(left) < 0){
+                    return false;
+                }
+            }else{
+                if(value.compareTo(left) <= 0){
+                    return false;
+                }
+            }
+        }
+        //Проверяем правую границу
+        if(!isRightOpen){
+            if(!isRightStrict){
+                if(value.compareTo(right) > 0){
+                    return false;
+                }
+            }else{
+               if(value.compareTo(right) >= 0){
+                   return false;
+               }
+            }
+        }
+        return true;
+    }
+
 }
