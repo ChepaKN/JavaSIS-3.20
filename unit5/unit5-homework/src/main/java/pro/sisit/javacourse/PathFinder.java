@@ -2,7 +2,6 @@ package pro.sisit.javacourse;
 
 import pro.sisit.javacourse.optimal.DeliveryTask;
 import pro.sisit.javacourse.optimal.Route;
-import pro.sisit.javacourse.optimal.RouteType;
 import pro.sisit.javacourse.optimal.Transport;
 
 import java.math.BigDecimal;
@@ -19,35 +18,57 @@ public class PathFinder {
     public Transport getOptimalTransport(DeliveryTask deliveryTask, List<Transport> transports) {
         // ToDo: realize me!
 
-        if (deliveryTask == null) return null;
-        if (transports == null) return null;
-
-        //Тип маршрута, разрешенный для данного груза
-        List<RouteType> availableRoutesType = deliveryTask.getRoutes()
-                .stream()
-                .map(Route::getType)
-                .collect(Collectors.toList());
-
-        //Скопируем тот транспорт, который подходит для  данного груза
-        List<Transport> availableTransport = transports.stream()
-                .filter(transport -> availableRoutesType.contains(transport.getType()))                 //Фильтрация по типу
-                .filter(transport -> transport.getVolume().compareTo(deliveryTask.getVolume()) >= 0)    //Фильтрация по объему
-                .collect(Collectors.toList());
-
-        //Не нашлось подходящего транспорта
-        if(availableTransport.isEmpty()) return null;
-
-        //Упакуем в map, чтобы удабно было узнать длину маршрута для заданного типа по ключу RouteType
-        Map<RouteType, BigDecimal> routesMap = new HashMap<>();
-        for (Route r : deliveryTask.getRoutes()) {
-            routesMap.put(r.getType(), r.getLength());
+        if (!Optional.ofNullable(deliveryTask).isPresent() || !Optional.ofNullable(transports).isPresent()) {
+            return null;
         }
 
+        //Скопируем тот транспорт, который подходит для  данного груза
+        List<Transport> availableTransport = getAvailableTransport(deliveryTask, transports);
+
+        //Не нашлось подходящего транспорта
+        if(!Optional.ofNullable(availableTransport).isPresent()) return null;
+
         //Отсортируем коллекцию по критерию "lenght * price"
+        Comparator<Transport> transportComparator =  Comparator.comparing(transport -> getTotalPriceByRoute(deliveryTask, transport));
         List<Transport> sortedTransport = availableTransport.stream()
-                .sorted(Comparator.comparing(o -> o.getPrice().multiply(routesMap.get(o.getType()))))
+                .sorted(transportComparator)
                 .collect(Collectors.toList());
 
+        //Хотя этот лист всегда непустой...
+        if (sortedTransport.isEmpty()) return null;
         return  sortedTransport.get(0);
     }
+
+    private List<Transport> getAvailableTransport(DeliveryTask deliveryTask, List<Transport> transports){
+        return
+        transports.stream()
+                .filter(transport -> filterByTransportType(deliveryTask, transport))     //Фильтрация по типу
+                .filter(transport -> filterByVolume(deliveryTask, transport))           //Фильтрация по объему
+                .collect(Collectors.toList());
+    }
+
+    private boolean filterByTransportType(DeliveryTask deliveryTask, Transport transport){
+        return
+        deliveryTask.getRoutes()
+                .stream()
+                .map(Route::getType)
+                .collect(Collectors.toList())
+                .contains(transport.getType());
+    }
+
+    private boolean filterByVolume(DeliveryTask deliveryTask, Transport transport){
+        return transport.getVolume().compareTo(deliveryTask.getVolume()) >= 0;
+    }
+
+    private BigDecimal getTotalPriceByRoute(DeliveryTask deliveryTask, Transport transport){
+        return
+                deliveryTask.getRoutes()
+                        .stream()
+                        .filter(route -> route.getType().equals(transport.getType()))
+                        .findAny()
+                        .map(route -> route.getLength().multiply(transport.getPrice()))
+                        .orElse(null);
+    }
+
 }
+

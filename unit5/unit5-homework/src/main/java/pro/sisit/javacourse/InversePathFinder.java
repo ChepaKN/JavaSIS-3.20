@@ -5,7 +5,6 @@ import pro.sisit.javacourse.inverse.InverseDeliveryTask;
 import pro.sisit.javacourse.inverse.Solution;
 import pro.sisit.javacourse.optimal.DeliveryTask;
 import pro.sisit.javacourse.optimal.Route;
-import pro.sisit.javacourse.optimal.RouteType;
 import pro.sisit.javacourse.optimal.Transport;
 
 import java.math.BigDecimal;
@@ -33,74 +32,90 @@ public class InversePathFinder {
         // ToDo: realize me!
 
         List<Solution> solutions = new ArrayList<>();
-        if ((task == null) || (task.getTasks() == null) || (task.getTransports() == null) || (task.getPriceRange() == null)){
+
+        //Если необходимо, возвращаем пустой список
+        if(isInverseDeliveryTaskSomeNull(task)){
             return solutions;
         }
 
         //Список решенных задач
         List<DeliveryTask> deliveryTasks = task.getTasks();
 
-        //Список транспорта, возможного для решения этих
+        //Список транспорта, возможного для решения этих задач
         List<Transport> transports = task.getTransports();
 
         //Диапазон затрат
         BigDecimalRange range = task.getPriceRange();
 
-        //todo: как бы тут прикрутить стрим...
-        for (DeliveryTask deliveryTask : deliveryTasks) {
-
-            Map<RouteType, BigDecimal> routesMap = routesToMap(deliveryTask);
-            List<Transport> availableTransport = getAvailableTransport(deliveryTask, transports, range);
-
-            //Добавим в коллекцию все решения
-            if (availableTransport.size() > 0) {
-                for (Transport t : availableTransport) {
-                    solutions.add(new Solution(deliveryTask, t, t.getPrice().multiply(routesMap.get(t.getType()))));
-                }
-            }
-        }
+        deliveryTasks
+                //Здесь: имеем весь доступный и подходящий транпорт для решения задачи перевозки
+                .forEach(deliveryTask -> getAvailableTransport(deliveryTask, transports, range)
+                //Добавляем все возможные решения в список
+                .forEach(transport -> solutions.add(new Solution(deliveryTask, transport, getTotalPriceByRoute(deliveryTask, transport)))));
 
         //Сортируем список
         Comparator<Solution> solutionComparator = Comparator.comparing(Solution::getPrice).reversed().
                 thenComparing(solution -> solution.getDeliveryTask().getName());
 
-        solutions = solutions.stream()
+        return solutions.stream()
                 .sorted(solutionComparator)
                 .collect(Collectors.toList());
 
-        return solutions;
-
     }
-
-    private Map<RouteType, BigDecimal> routesToMap(DeliveryTask deliveryTask){
-            //Упакуем в map, чтобы удабно было узнать длину маршрута для заданного типа по ключу RouteType
-            Map<RouteType, BigDecimal> routesMap = new HashMap<>();
-            for (Route r : deliveryTask.getRoutes()) {
-                routesMap.put(r.getType(), r.getLength());
-            }
-            return routesMap;
-    }
-
-
-    private List<RouteType> getAvailableRoutesType(DeliveryTask deliveryTask) {
-        return deliveryTask.getRoutes()
-                .stream()
-                .map(Route::getType)
-                .collect(Collectors.toList());
-    }
-
 
     private List<Transport> getAvailableTransport(DeliveryTask task, List<Transport> transports, BigDecimalRange range) {
-
-        List<RouteType> availableRoutesType = getAvailableRoutesType(task);
-        Map<RouteType, BigDecimal> routesMap = routesToMap(task);
-
+        //Метод возвращает доступный для данного решения транспорт
         return transports.stream()
-                .filter(transport -> availableRoutesType.contains(transport.getType()))                                     //Фильтрация по типу
-                .filter(transport -> transport.getVolume().compareTo(task.getVolume()) >= 0)                                //Фильтрация по объему
-                .filter(transport -> range.inRange(transport.getPrice().multiply(routesMap.get(transport.getType()))))      //Фильтрация по цене
+                .filter(transport -> filterByTransportType(task, transport))                 //Фильтрация по типу
+                .filter(transport -> filterByVolume(task, transport))                        //Фильтрация по объему
+                .filter(transport -> filterByTotalRoutePrice(range, task, transport))        //Фильтрация по цене
                 .collect(Collectors.toList());
+    }
 
+    private BigDecimal getTotalPriceByRoute(DeliveryTask deliveryTask, Transport transport){
+        return
+        deliveryTask.getRoutes()
+                .stream()
+                .filter(route -> route.getType().equals(transport.getType()))
+                .findAny()
+                .map(route -> route.getLength().multiply(transport.getPrice()))
+                .orElse(null);
+    }
+
+    private boolean filterByTotalRoutePrice(BigDecimalRange range, DeliveryTask deliveryTask, Transport transport){
+        BigDecimal totalPrise = getTotalPriceByRoute(deliveryTask, transport);
+        if(Optional.ofNullable(totalPrise).isPresent()){
+            return range.inRange(totalPrise);
+        }else return false;
+    }
+
+    private boolean filterByTransportType(DeliveryTask deliveryTask, Transport transport){
+        return
+        deliveryTask.getRoutes()
+                .stream()
+                .map(Route::getType)
+                .collect(Collectors.toList())
+                .contains(transport.getType());
+    }
+
+    private boolean filterByVolume(DeliveryTask deliveryTask, Transport transport){
+        return transport.getVolume().compareTo(deliveryTask.getVolume()) >= 0;
+    }
+
+    private boolean isInverseDeliveryTaskSomeNull(InverseDeliveryTask task){
+        if(!Optional.ofNullable(task).isPresent()){
+            return true;
+        }
+        if(!Optional.ofNullable(task.getTransports()).isPresent()){
+            return true;
+        }
+        if(!Optional.ofNullable(task.getPriceRange()).isPresent()){
+            return true;
+        }
+        if(!Optional.ofNullable(task.getTasks()).isPresent()){
+            return true;
+        }
+        return false;
     }
 }
 
