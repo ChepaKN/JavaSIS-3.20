@@ -50,13 +50,13 @@ public class InversePathFinder {
         deliveryTasks
                 //Здесь: имеем весь доступный и подходящий транпорт для решения задачи перевозки
                 .forEach(deliveryTask -> getAvailableTransport(deliveryTask, transports, range)
-                //Добавляем все возможные решения в список
-                .forEach(transport -> solutions.add(new Solution(deliveryTask, transport, getTotalPriceByRoute(deliveryTask, transport)))));
+                    //Добавляем все возможные решения в список
+                    .forEach(transport -> solutions.add(new Solution(deliveryTask, transport, getTotalPriceByRoute(deliveryTask, transport)))));
 
         //Сортируем список
         Comparator<Solution> solutionComparator = Comparator.comparing(Solution::getPrice).reversed().
                 thenComparing(solution -> solution.getDeliveryTask().getName());
-
+        
         return solutions.stream()
                 .sorted(solutionComparator)
                 .collect(Collectors.toList());
