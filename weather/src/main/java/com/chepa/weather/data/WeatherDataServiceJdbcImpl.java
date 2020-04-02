@@ -1,7 +1,5 @@
 package com.chepa.weather.data;
 
-import com.chepa.weather.dto.weatherDTO;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 

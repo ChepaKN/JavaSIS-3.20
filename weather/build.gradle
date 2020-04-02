@@ -20,6 +20,8 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	compile 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
+	implementation('org.projectlombok:lombok:1.18.2')
+	annotationProcessor('org.projectlombok:lombok:1.18.2')
 }
 
 test {

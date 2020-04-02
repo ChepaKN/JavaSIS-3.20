@@ -1,7 +1,5 @@
 package com.chepa.weather.WeatherService;
 
-import com.chepa.weather.data.WeatherDataService;
-import com.chepa.weather.data.WeatherDataServiceJdbcImpl;
 import com.chepa.weather.dto.weatherDTO;
 import com.chepa.weather.meteo.MeteoService;
 import org.slf4j.Logger;
@@ -49,7 +47,6 @@ public class WeatherServiceImpl implements WeatherService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ResponseEntity<weatherDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, weatherDTO.class);
-//        ResponseEntity<String> responseStr = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         String code = Objects.requireNonNull(response.getBody()).getCod();
         if(code.equals("200")){
