@@ -9,6 +9,4 @@ public class weatherDTO {
     private windDTO wind;
     private String cod;
     private String name;
-    private String Date;
-
 }

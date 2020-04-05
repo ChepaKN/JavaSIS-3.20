@@ -1,11 +1,15 @@
 package com.chepa.weather.WeatherService;
 
+import com.chepa.weather.dto.weatherDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +25,7 @@ class WeatherServiceImplTest {
     @Test
     void getWeather() {
         String targetCity = "Abakan";
-        String getWeather = weatherService.getWeather(targetCity);
-        assertTrue(getWeather.contains(targetCity));
+//        ResponseEntity<weatherDTO> getWeather = weatherService.getWeather(targetCity);
+//        assertTrue(Objects.requireNonNull(getWeather.getBody()).getName().contains(targetCity));
     }
 }

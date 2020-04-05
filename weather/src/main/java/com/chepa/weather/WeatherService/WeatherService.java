@@ -1,5 +1,7 @@
 package com.chepa.weather.WeatherService;
 
+import com.chepa.weather.sql.SQLData;
+
 public interface WeatherService {
-    String getWeather(String targetCity);
+    SQLData getWeather(String targetCity);
 }

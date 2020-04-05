@@ -2,11 +2,16 @@ package com.chepa.weather.shell;
 
 import com.chepa.weather.WeatherService.WeatherService;
 import com.chepa.weather.data.WeatherDataService;
+import com.chepa.weather.sql.SQLData;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @ShellComponent
 public class ShellCommands {
@@ -20,21 +25,44 @@ public class ShellCommands {
     private final WeatherDataService weatherDataService;
 
     @ShellMethod("Запросить погоду")
-    public String weather(
+    public String get(
         @ShellOption(defaultValue = "Minusinsk") String targetCity){
-        String lastRequest = weatherService.getWeather(targetCity);
+        SQLData sqlData = weatherService.getWeather(targetCity);
 
         //Update database if request finish is correctly
-        if(!lastRequest.contains("Incorrect response")){
-            weatherDataService.save(lastRequest);
+        if(sqlData != null){
+            weatherDataService.save(sqlData);
         }
-        return lastRequest;
+        return Objects.requireNonNull(sqlData).toString();
     }
 
     @ShellMethod("Загрузить записи из базы")
     public String show(){
-        return weatherDataService.getAll().stream()
-                .collect(Collectors.joining(System.lineSeparator()));
+        List<String> fields = weatherDataService.getAll();
+        StringBuilder toReturn = new StringBuilder();
+        String[] str;
+        for(String f : fields){
+            str = f.split(";");
+            str[0] = new java.util.Date(Long.parseLong(str[0])*1000).toString();
+            str[2] = "Ветер " + str[2] + "[m/s]";
+            str[3] = "Влажность: " + str[3] + "%";
+            toReturn.append(Arrays.toString(str)).append(System.lineSeparator());
+        }
+        return toReturn.toString();
+    }
+
+    @ShellMethod("Среднемесячная погода. Введите Город, интервал месяцев в формате: 'dd-MM-yyyy  dd-MM-yyyy'")
+    public String getAverage(
+            @ShellOption(defaultValue = "Minusinsk") String targetCity,
+            @ShellOption(defaultValue = "05-04-2020") String startMonth,
+            @ShellOption(defaultValue = "06-04-2020") String stopMonth){
+        String toReturn = "";
+        DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate start = LocalDate.parse(startMonth, FORMATTER);
+        LocalDate stop = LocalDate.parse(stopMonth, FORMATTER);
+
+        toReturn = weatherDataService.getAverageWeather(targetCity, start, stop);
+        return toReturn;
     }
 }
 

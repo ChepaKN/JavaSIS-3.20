@@ -1,7 +1,7 @@
 package com.chepa.weather.WeatherService;
 
+import com.chepa.weather.sql.SQLData;
 import com.chepa.weather.dto.weatherDTO;
-import com.chepa.weather.meteo.MeteoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class WeatherServiceImpl implements WeatherService {
@@ -17,8 +18,6 @@ public class WeatherServiceImpl implements WeatherService {
     private final RestTemplate restTemplate;
     private static Logger logger
             = LoggerFactory.getLogger(WeatherServiceImpl.class);
-
-    private MeteoService meteoService;
 
     @Value("${host}")
     private String apiHost;
@@ -31,14 +30,36 @@ public class WeatherServiceImpl implements WeatherService {
 
     public WeatherServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.meteoService = new MeteoService();
     }
 
 
-    @Override
-    public String getWeather(String targetCity) {
+    private boolean transactionIsValid(ResponseEntity<weatherDTO> response){
 
-        String toReturn = "";
+        //Метод проверяет ключевые поля на достоверность данных:
+        String code = Objects.requireNonNull(response.getBody()).getCod();
+        if(!code.equals(Integer.toString(HttpStatus.OK.value()))){
+            return false;
+        }
+        //дата
+        long time = (response.getHeaders().getFirstDate("Date"));
+        if(time == -1){
+            return false;
+        }
+        //Город
+        Optional<String> city = Optional.ofNullable(Objects.requireNonNull(response.getBody()).getName());
+        if(!city.isPresent()){
+           return false;
+        }
+        //Температура
+        Optional<String> temperature = Optional.ofNullable(response.getBody().getMain().getTemp());
+
+        //Остальные поля необязательные, проверим их при заполнении таблицы
+        return temperature.isPresent();
+    }
+
+    @Override
+    public SQLData getWeather(String targetCity) {
+
         String url = String.format("%s%s", apiURL, targetCity);
 
         HttpHeaders headers = new HttpHeaders();
@@ -48,46 +69,8 @@ public class WeatherServiceImpl implements WeatherService {
 
         ResponseEntity<weatherDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, weatherDTO.class);
 
-        String code = Objects.requireNonNull(response.getBody()).getCod();
-        if(code.equals("200")){
-            toReturn = DTO2stringConverter(response);
-        }else toReturn = String.format("Incorrect response from the service code=%s", code);
-
-        return toReturn;
-
-    }
-
-    private String toSignedTemp(String input){
-        double output = Double.parseDouble(input);
-        if(output > 0) return "+" + output;
-        else return Double.toString(output);
-    }
-
-    private String DTO2stringConverter(ResponseEntity<weatherDTO> response){
-
-        StringBuilder toReturn = new StringBuilder();
-        String customSeparator = ";  ";
-
-        //Время + дата
-        toReturn.append(new java.util.Date(response.getHeaders().getFirstDate("Date")))
-                .append(customSeparator);
-        //Город + погода
-        toReturn.append(Objects.requireNonNull(response.getBody()).getName())
-                .append(": ")
-                .append(toSignedTemp(response.getBody().getMain().getTemp()))
-                .append(customSeparator);
-        //Ветер (Направление + скорость)
-        toReturn.append("Ветер: ").append(meteoService.degreeToWindDirection(response.getBody().getWind().getDeg()))
-                .append(" ")
-                .append(response.getBody().getWind().getSpeed())
-                .append(" м/с")
-                .append(customSeparator);
-        //Влажность
-        toReturn.append("Влажность: ")
-                .append(response.getBody().getMain().getHumidity())
-                .append("%")
-                .append(customSeparator);
-
-        return toReturn.toString();
+        if(transactionIsValid(response)){
+            return new SQLData().fillSqlDataFromDto(response);
+        }else return null;
     }
 }

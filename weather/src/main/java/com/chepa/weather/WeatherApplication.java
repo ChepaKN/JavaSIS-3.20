@@ -1,7 +1,6 @@
 package com.chepa.weather;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,11 @@ public class WeatherApplication {
 
 	@PostConstruct
 	private void createWeatherTable(){
-		jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS Weather (value text)");
+		jdbcTemplate.update("CREATE TABLE IF NOT EXISTS WeatherData (Date integer," +
+				"City text," +
+				"Temp text, " +
+				"Wind text," +
+				"Humidity text )");
 	}
 
 }
