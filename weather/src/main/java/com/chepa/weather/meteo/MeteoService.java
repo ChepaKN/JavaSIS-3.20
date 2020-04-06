@@ -8,10 +8,9 @@ public class MeteoService {
                                         "W", "WNW", "NW", "NNW"};
 
     public String degreeToWindDirection(String deg){
-        double step = 22.5;
+        double step = 360.0/windDirections.length;
         double direction = Double.parseDouble(deg);
-        int points = (int) (360 / step);
-        int index = (int)(((direction - step/2) / step + 1) % points);
+        int index = (int)(((direction - step/2) / step + 1) % windDirections.length);
         return windDirections[index];
     }
 }

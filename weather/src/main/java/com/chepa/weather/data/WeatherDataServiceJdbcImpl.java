@@ -1,6 +1,5 @@
 package com.chepa.weather.data;
 
-import com.chepa.weather.meteo.MeteoService;
 import com.chepa.weather.sql.SQLData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,8 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class WeatherDataServiceJdbcImpl implements WeatherDataService {
@@ -20,8 +18,6 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-//    MeteoService meteoService = new MeteoService();
-
     @Value("${zoneId}")
     private String zoneIdentifier;
 
@@ -29,7 +25,6 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
     public void save(SQLData sqlData) {
 
         jdbcTemplate.update("INSERT INTO WeatherData (Date, City, Temp, Wind, Humidity) VALUES (?, ?, ?, ?, ?)",
-//                sqlData.getDate().toString(),
                 sqlData.getDate(),
                 sqlData.getCity(),
                 sqlData.getTemperature(),
@@ -50,6 +45,17 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
 
     @Override
     public String getAverageWeather(String city, LocalDate startDate, LocalDate stopDate){
+
+        List<String> dbQuery = queryDataBase(city, startDate, stopDate);
+        if(dbQuery.isEmpty()){
+            throw new RuntimeException("There are no entries in the database that satisfy the condition.");
+        }
+
+        return city + ": " + buildStringFromDB(dbQuery);
+
+    }
+
+    private List<String> queryDataBase(String city, LocalDate startDate, LocalDate stopDate){
         ZoneId zoneId = ZoneId.of(zoneIdentifier);
         long startDateUnix = Date.from(startDate.atStartOfDay(zoneId).toInstant()).getTime()/1000;
         long stopDateUnix = Date.from(stopDate.atStartOfDay(zoneId).toInstant()).getTime()/1000;
@@ -64,24 +70,48 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
                 startDateUnix,
                 stopDateUnix);
 
-        List<String> dbQuery = jdbcTemplate.query(sqlQuery,
+        return jdbcTemplate.query(sqlQuery,
                 (rs, rowNum) -> rs.getString("Date") + rowSeparator +
                         rs.getString("City") + "; " +
                         rs.getString("Temp") + rowSeparator +
                         rs.getString("Wind") + rowSeparator +
                         rs.getString("Humidity"));
+    }
 
-        if(dbQuery.isEmpty()){
-            throw new RuntimeException("There are no entries in the database that satisfy the condition.");
-        }
+    private String buildStringFromDB(List<String> dbQuery){
+        Map<String, Double> monthTempContainer = new HashMap<>();
+        Map<String, Integer> monthCountContainer = new HashMap<>();
+        List<String> keys = new ArrayList<>();
 
-        double tempAccumulator = 0.0;
-        String[] queryBuf;
+        SQLStringParser sqlStringParser = new SQLStringParser();
+
+        String key;
         for(String q : dbQuery){
-            queryBuf = q.split(rowSeparator);
-            tempAccumulator += Double.parseDouble(queryBuf[2]);
+            sqlStringParser.parse(q);
+            key = sqlStringParser.getDate();
+
+            if(!keys.contains(key)){
+                keys.add(key);
+            }
+            if(monthTempContainer.containsKey(key)){
+                monthTempContainer.put(key,
+                        monthTempContainer.get(key) +
+                                sqlStringParser.getTemp());
+                monthCountContainer.put(key,monthCountContainer.get(key) + 1);
+            }else{
+                monthTempContainer.put(sqlStringParser.getDate(),
+                        sqlStringParser.getTemp());
+                monthCountContainer.put(key, 1);
+            }
         }
-        return String.format("Average weather in %s: %5.4f", city, tempAccumulator/dbQuery.size());
+
+        StringBuilder toReturn = new StringBuilder();
+        for(String k : keys){
+            toReturn.append(k).append(": ");
+            toReturn.append(monthTempContainer.get(k) / monthCountContainer.get(k));
+            toReturn.append(System.lineSeparator());
+        }
+        return toReturn.toString();
     }
 
 }

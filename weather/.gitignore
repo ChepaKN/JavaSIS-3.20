@@ -30,3 +30,6 @@ out/
 
 ### VS Code ###
 .vscode/
+/spring-shell.log
+/weather.log
+/data/weather_data_base.mv.db

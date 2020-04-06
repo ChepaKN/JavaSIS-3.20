@@ -29,7 +29,7 @@ public class ShellCommands {
         @ShellOption(defaultValue = "Minusinsk") String targetCity){
         SQLData sqlData = weatherService.getWeather(targetCity);
 
-        //Update database if request finish is correctly
+        //Если запрос выполнился корректо, сохраним результат в базу
         if(sqlData != null){
             weatherDataService.save(sqlData);
         }
@@ -54,8 +54,8 @@ public class ShellCommands {
     @ShellMethod("Среднемесячная погода. Введите Город, интервал месяцев в формате: 'dd-MM-yyyy  dd-MM-yyyy'")
     public String getAverage(
             @ShellOption(defaultValue = "Minusinsk") String targetCity,
-            @ShellOption(defaultValue = "05-04-2020") String startMonth,
-            @ShellOption(defaultValue = "06-04-2020") String stopMonth){
+            @ShellOption(defaultValue = "01-01-1970") String startMonth,
+            @ShellOption(defaultValue = "01-01-2070") String stopMonth){
         String toReturn = "";
         DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate start = LocalDate.parse(startMonth, FORMATTER);
