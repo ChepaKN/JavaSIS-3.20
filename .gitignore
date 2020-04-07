@@ -1,0 +1,3 @@
+/weather/*.gz
+/weather/*.log
+/weather/data/*.db

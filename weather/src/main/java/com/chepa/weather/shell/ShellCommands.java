@@ -53,16 +53,23 @@ public class ShellCommands {
 
     @ShellMethod("Среднемесячная погода. Введите Город, интервал месяцев в формате: 'dd-MM-yyyy  dd-MM-yyyy'")
     public String getAverage(
-            @ShellOption(defaultValue = "Minusinsk") String targetCity,
+            @ShellOption(defaultValue = "Available") String targetCity,
             @ShellOption(defaultValue = "01-01-1970") String startMonth,
             @ShellOption(defaultValue = "01-01-2070") String stopMonth){
-        String toReturn = "";
+        StringBuilder toReturn = new StringBuilder();
         DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate start = LocalDate.parse(startMonth, FORMATTER);
         LocalDate stop = LocalDate.parse(stopMonth, FORMATTER);
 
-        toReturn = weatherDataService.getAverageWeather(targetCity, start, stop);
-        return toReturn;
+        if(targetCity.equals("Available")){
+            List<String> availableСities = weatherDataService.getCityList();
+            for(String city : availableСities){
+                toReturn.append(weatherDataService.getAverageWeather(city, start, stop));
+            }
+        }else{
+            toReturn = new StringBuilder(weatherDataService.getAverageWeather(targetCity, start, stop));
+        }
+        return toReturn.toString();
     }
 }
 

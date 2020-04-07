@@ -9,4 +9,5 @@ public interface WeatherDataService {
     void save(SQLData sqlData);
     List<String> getAll();
     String getAverageWeather(String city, LocalDate startDate, LocalDate stopDate);
+    List<String> getCityList();
 }

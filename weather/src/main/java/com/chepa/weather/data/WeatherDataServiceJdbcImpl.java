@@ -55,6 +55,12 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
 
     }
 
+    @Override
+    public List<String> getCityList(){
+        return jdbcTemplate.query("SELECT DISTINCT  City FROM WeatherData",
+                (rs, rowNum) -> rs.getString("City"));
+    }
+
     private List<String> queryDataBase(String city, LocalDate startDate, LocalDate stopDate){
         ZoneId zoneId = ZoneId.of(zoneIdentifier);
         long startDateUnix = Date.from(startDate.atStartOfDay(zoneId).toInstant()).getTime()/1000;
