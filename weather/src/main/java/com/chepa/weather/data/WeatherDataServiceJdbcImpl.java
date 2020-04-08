@@ -48,9 +48,8 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
 
         List<String> dbQuery = queryDataBase(city, startDate, stopDate);
         if(dbQuery.isEmpty()){
-            throw new RuntimeException("There are no entries in the database that satisfy the condition.");
+            throw new RuntimeException("Не обнаружено записей, удовлетворяющих условиям.");
         }
-
         return city + ": " + buildStringFromDB(dbQuery);
 
     }
@@ -118,21 +117,6 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
             toReturn.append(System.lineSeparator());
         }
         return toReturn.toString();
-    }
-
-    public void fillDataBase(){
-        int secPerYear = 31536000;
-        double temp = 36.6;
-        WeatherDataService weatherDataService = new WeatherDataServiceJdbcImpl(new JdbcTemplate());
-        SQLData sqlData = new SQLData();
-        sqlData.setDate(Instant.now().getEpochSecond() +
-                (long) (Math.random() * secPerYear) - secPerYear/2);
-        sqlData.setTemperature(String.valueOf(temp + Math.random()*4 - 2));
-        sqlData.setCity("Astana");
-        sqlData.setWind("Test field");
-        sqlData.setHumidity("Test field");
-
-        weatherDataService.save(sqlData);
     }
 
 }

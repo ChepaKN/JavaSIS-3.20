@@ -3,7 +3,7 @@ package com.chepa.weather.dto;
 import lombok.Getter;
 
 @Getter
-public class tempDTO {
+public class TempDTO {
 
     private String temp;
     private String feels_like;

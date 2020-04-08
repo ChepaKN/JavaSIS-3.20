@@ -1,7 +1,6 @@
 package com.chepa.weather.data;
 
 import lombok.Getter;
-
 import java.util.Date;
 
 @Getter

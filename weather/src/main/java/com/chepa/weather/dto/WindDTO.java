@@ -3,7 +3,7 @@ package com.chepa.weather.dto;
 import lombok.Getter;
 
 @Getter
-public class windDTO {
+public class WindDTO {
     private String speed;
     private String deg;
 }

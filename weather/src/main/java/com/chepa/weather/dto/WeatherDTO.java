@@ -3,10 +3,10 @@ package com.chepa.weather.dto;
 import lombok.Getter;
 
 @Getter
-public class weatherDTO {
+public class WeatherDTO {
 
-    private tempDTO main;
-    private windDTO wind;
+    private TempDTO main;
+    private WindDTO wind;
     private String cod;
     private String name;
 }

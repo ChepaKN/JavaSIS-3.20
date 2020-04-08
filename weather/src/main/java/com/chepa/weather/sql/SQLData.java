@@ -1,11 +1,12 @@
 package com.chepa.weather.sql;
 
-import com.chepa.weather.dto.weatherDTO;
+import com.chepa.weather.dto.WeatherDTO;
 import com.chepa.weather.meteo.MeteoService;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,28 +29,30 @@ public class SQLData {
                 "Humidity: " + humidity + "%";
     }
 
-    public SQLData fillSqlDataFromDto(ResponseEntity<weatherDTO> response) {
+    public SQLData fillSqlDataFromDto(WeatherDTO response) {
         SQLData sqlData = new SQLData();
         MeteoService meteoService = new MeteoService();
 
         //дата
-        sqlData.setDate(response.getHeaders().getFirstDate("Date")/1000);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        long timeInSeconds = localDateTime.toEpochSecond(ZoneOffset.UTC);
+        sqlData.setDate(timeInSeconds);
         //Город
-        sqlData.setCity(Objects.requireNonNull(response.getBody()).getName());
+        sqlData.setCity(Objects.requireNonNull(response.getName()));
         //Температура
-        sqlData.setTemperature(response.getBody().getMain().getTemp());
+        sqlData.setTemperature(response.getMain().getTemp());
 
         //Отсутствие следующих полей не фатально, если что, запишем туда "NAN":
         //Ветер
-        Optional<String> windDirection = Optional.ofNullable(response.getBody().getWind().getDeg());
-        Optional<String> windSpeed = Optional.ofNullable(response.getBody().getWind().getSpeed());
+        Optional<String> windDirection = Optional.ofNullable(response.getWind().getDeg());
+        Optional<String> windSpeed = Optional.ofNullable(response.getWind().getSpeed());
         if(windDirection.isPresent() && windSpeed.isPresent()){
             sqlData.setWind(meteoService.degreeToWindDirection(windDirection.get()) + ": " +  windSpeed.get());
         }else{
             sqlData.setWind("NAN");
         }
         //Влажность
-        Optional<String> airHumidity = Optional.ofNullable(response.getBody().getMain().getHumidity());
+        Optional<String> airHumidity = Optional.ofNullable(response.getMain().getHumidity());
         if(airHumidity.isPresent()){
             sqlData.setHumidity(airHumidity.get());
         }else{

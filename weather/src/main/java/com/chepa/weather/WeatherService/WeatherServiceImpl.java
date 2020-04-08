@@ -1,7 +1,7 @@
 package com.chepa.weather.WeatherService;
 
+import com.chepa.weather.dto.WeatherDTO;
 import com.chepa.weather.sql.SQLData;
-import com.chepa.weather.dto.weatherDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
 
-    private boolean transactionIsValid(ResponseEntity<weatherDTO> response){
+    private boolean transactionIsValid(ResponseEntity<WeatherDTO> response){
 
         //Метод проверяет ключевые поля на достоверность данных:
         String code = Objects.requireNonNull(response.getBody()).getCod();
@@ -67,11 +67,15 @@ public class WeatherServiceImpl implements WeatherService {
         headers.set("x-rapidapi-key", apiKey);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<weatherDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, weatherDTO.class);
+        ResponseEntity<WeatherDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, WeatherDTO.class);
 
+        SQLData sqlData;
         if(transactionIsValid(response)){
-            return new SQLData().fillSqlDataFromDto(response);
+            sqlData = new SQLData().fillSqlDataFromDto(Objects.requireNonNull(response.getBody()));
+            logger.info(sqlData.toString());
+            return sqlData;
         }else {
+            logger.warn("Запрос к сервису завершился некорректно.");
             throw new RuntimeException("Запрос к сервису завершился некорректно, пожалуйста, проверьте исходные данные.");
         }
     }
