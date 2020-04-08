@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -23,7 +24,6 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
 
     @Override
     public void save(SQLData sqlData) {
-
         jdbcTemplate.update("INSERT INTO WeatherData (Date, City, Temp, Wind, Humidity) VALUES (?, ?, ?, ?, ?)",
                 sqlData.getDate(),
                 sqlData.getCity(),
@@ -118,6 +118,21 @@ public class WeatherDataServiceJdbcImpl implements WeatherDataService {
             toReturn.append(System.lineSeparator());
         }
         return toReturn.toString();
+    }
+
+    public void fillDataBase(){
+        int secPerYear = 31536000;
+        double temp = 36.6;
+        WeatherDataService weatherDataService = new WeatherDataServiceJdbcImpl(new JdbcTemplate());
+        SQLData sqlData = new SQLData();
+        sqlData.setDate(Instant.now().getEpochSecond() +
+                (long) (Math.random() * secPerYear) - secPerYear/2);
+        sqlData.setTemperature(String.valueOf(temp + Math.random()*4 - 2));
+        sqlData.setCity("Astana");
+        sqlData.setWind("Test field");
+        sqlData.setHumidity("Test field");
+
+        weatherDataService.save(sqlData);
     }
 
 }

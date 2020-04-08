@@ -24,14 +24,8 @@ public class SQLData {
         return new java.util.Date(date * 1000) + customSeparator +
                 city + ": " +
                 temperature + customSeparator +
-                "Wind " + wind + "[m/s]" + customSeparator +
+                "Wind " + wind + " m/s" + customSeparator +
                 "Humidity: " + humidity + "%";
-    }
-
-    private String toSignedTemp(String input){
-        double output = Double.parseDouble(input);
-        if(output > 0) return "+" + output;
-        else return Double.toString(output);
     }
 
     public SQLData fillSqlDataFromDto(ResponseEntity<weatherDTO> response) {
@@ -43,7 +37,7 @@ public class SQLData {
         //Город
         sqlData.setCity(Objects.requireNonNull(response.getBody()).getName());
         //Температура
-        sqlData.setTemperature(toSignedTemp(response.getBody().getMain().getTemp()));
+        sqlData.setTemperature(response.getBody().getMain().getTemp());
 
         //Отсутствие следующих полей не фатально, если что, запишем туда "NAN":
         //Ветер
@@ -63,6 +57,4 @@ public class SQLData {
         }
         return sqlData;
     }
-
-//    public SQLData fillSqlDataFromDB(String)
 }

@@ -29,10 +29,8 @@ public class ShellCommands {
         @ShellOption(defaultValue = "Minusinsk") String targetCity){
         SQLData sqlData = weatherService.getWeather(targetCity);
 
-        //Если запрос выполнился корректо, сохраним результат в базу
-        if(sqlData != null){
-            weatherDataService.save(sqlData);
-        }
+        //Сохраним результат в базу
+        weatherDataService.save(sqlData);
         return Objects.requireNonNull(sqlData).toString();
     }
 
@@ -44,7 +42,7 @@ public class ShellCommands {
         for(String f : fields){
             str = f.split(";");
             str[0] = new java.util.Date(Long.parseLong(str[0])*1000).toString();
-            str[2] = "Ветер " + str[2] + "[m/s]";
+            str[2] = "Ветер " + str[2] + "m/s";
             str[3] = "Влажность: " + str[3] + "%";
             toReturn.append(Arrays.toString(str)).append(System.lineSeparator());
         }
@@ -62,8 +60,8 @@ public class ShellCommands {
         LocalDate stop = LocalDate.parse(stopMonth, FORMATTER);
 
         if(targetCity.equals("Available")){
-            List<String> availableСities = weatherDataService.getCityList();
-            for(String city : availableСities){
+            List<String> availableCities = weatherDataService.getCityList();
+            for(String city : availableCities){
                 toReturn.append(weatherDataService.getAverageWeather(city, start, stop));
             }
         }else{

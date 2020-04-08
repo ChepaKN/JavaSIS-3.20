@@ -71,6 +71,8 @@ public class WeatherServiceImpl implements WeatherService {
 
         if(transactionIsValid(response)){
             return new SQLData().fillSqlDataFromDto(response);
-        }else return null;
+        }else {
+            throw new RuntimeException("Запрос к сервису завершился некорректно, пожалуйста, проверьте исходные данные.");
+        }
     }
 }
