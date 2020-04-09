@@ -18,25 +18,13 @@ public class PathFinder {
     public Transport getOptimalTransport(DeliveryTask deliveryTask, List<Transport> transports) {
         // ToDo: realize me!
 
-        if (!Optional.ofNullable(deliveryTask).isPresent() || !Optional.ofNullable(transports).isPresent()) {
-            return null;
-        }
-
-        //Скопируем тот транспорт, который подходит для  данного груза
-        List<Transport> availableTransport = getAvailableTransport(deliveryTask, transports);
-
-        //Не нашлось подходящего транспорта
-        if(!Optional.ofNullable(availableTransport).isPresent()) return null;
-
-        //Отсортируем коллекцию по критерию "lenght * price"
         Comparator<Transport> transportComparator =  Comparator.comparing(transport -> getTotalPriceByRoute(deliveryTask, transport));
-        List<Transport> sortedTransport = availableTransport.stream()
-                .sorted(transportComparator)
-                .collect(Collectors.toList());
-
-        //Хотя этот лист всегда непустой...
-        if (sortedTransport.isEmpty()) return null;
-        return  sortedTransport.get(0);
+        return Optional.ofNullable(deliveryTask)
+                .flatMap(data -> Optional.ofNullable(transports))
+                .flatMap(data -> getAvailableTransport(deliveryTask, data)
+                        .stream()
+                        .min(transportComparator))
+                .orElse(null);
     }
 
     private List<Transport> getAvailableTransport(DeliveryTask deliveryTask, List<Transport> transports){
