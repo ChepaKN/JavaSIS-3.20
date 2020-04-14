@@ -12,22 +12,16 @@ public class PurchasedBook {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "bookId")
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "book_id")
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "buyerPersonId")
-    private BuyerPerson buyerPerson;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "sellerPersonId")
-    private SellerPerson sellerPerson;
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "buyer_id")
+    private Buyer buyer;
 
     @Column
-    private BigDecimal totalCost;
-
+    private BigDecimal cost;
 }
