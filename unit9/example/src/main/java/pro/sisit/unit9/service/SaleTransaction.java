@@ -7,7 +7,7 @@ import pro.sisit.unit9.entity.Seller;
 import java.math.BigDecimal;
 
 public interface SaleTransaction {
-    void saleTransaction(Book book, Buyer buyer, BigDecimal price);
+    void saleTransaction(Book book, Buyer buyer, Seller seller, BigDecimal price);
     BigDecimal totalCostByBook(Book book);
     BigDecimal totalCostByBuyer(Buyer buyer);
     BigDecimal totalCostBySeller(Seller seller);

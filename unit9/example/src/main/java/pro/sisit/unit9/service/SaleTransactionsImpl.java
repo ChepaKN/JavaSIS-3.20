@@ -9,7 +9,6 @@ import pro.sisit.unit9.entity.PurchasedBook;
 import pro.sisit.unit9.entity.Seller;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 
 @Service
@@ -19,11 +18,12 @@ public class SaleTransactionsImpl implements SaleTransaction{
     private final PurchasedBookRepository purchasedBookRepository;
 
     @Override
-    public void saleTransaction(Book book, Buyer buyer, BigDecimal price){
+    public void saleTransaction(Book book, Buyer buyer, Seller seller, BigDecimal price){
 
         PurchasedBook purchasedBook = new PurchasedBook();
         purchasedBook.setBook(book);
         purchasedBook.setBuyer(buyer);
+        purchasedBook.setSeller(seller);
         purchasedBook.setCost(price);
         purchasedBookRepository.save(purchasedBook);
 
@@ -31,7 +31,6 @@ public class SaleTransactionsImpl implements SaleTransaction{
 
     @Override
     public BigDecimal totalCostByBook (Book book) {
-        List<PurchasedBook> purchasedBooks = purchasedBookRepository.findByBook(book);
         return purchasedBookRepository.findByBook(book)
                 .stream()
                 .map(PurchasedBook::getCost)

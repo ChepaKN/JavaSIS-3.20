@@ -17,8 +17,6 @@ import pro.sisit.unit9.service.SaleTransactionsImpl;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -192,14 +190,17 @@ public class SpringDataApplicationTests {
 		Buyer buyer = new Buyer();
 		buyer.setName("Сергей Зверев");
 		buyer.setAddress("Тимирязева 1");
-		buyerRepository.save(buyer);
+
+		Seller seller = new Seller();
+		seller.setName("Владимир Соловьев");
+		seller.setMagazine("ItalyStore");
 
 		Book book = bookRepository.findAll().get(0);
 
 		BigDecimal price = BigDecimal.valueOf(123.45);
 
 		SaleTransaction saleTransactions = new SaleTransactionsImpl(purchasedBookRepository);
-		saleTransactions.saleTransaction(book, buyer, price);
+		saleTransactions.saleTransaction(book, buyer, seller, price);
 
 		boolean founded = false;
 		for (PurchasedBook iteratedBook : purchasedBookRepository.findAll()) {
@@ -222,7 +223,10 @@ public class SpringDataApplicationTests {
 		Book book = new Book();
 		book.setTitle("Шрэк");
 		book.setYear(2001);
-		bookRepository.save(book);
+
+		Seller seller = new Seller();
+		seller.setName("Фиона");
+		seller.setMagazine("Башня");
 
 		List<String> names = Arrays.asList("Шрэк", "Фиона", "Осел", "Дракон", "Пинокио");
 		BigDecimal price = BigDecimal.valueOf(123.45);
@@ -231,7 +235,7 @@ public class SpringDataApplicationTests {
 			buyer.setName(name);
 			buyer.setAddress("Болото");
 			buyerRepository.save(buyer);
-			saleTransactions.saleTransaction(book, buyer, price);
+			saleTransactions.saleTransaction(book, buyer, seller, price);
 		}
 
 		assertEquals(saleTransactions.totalCostByBook(book),
@@ -240,14 +244,17 @@ public class SpringDataApplicationTests {
 
 	@Test
 	@Transactional
-	public void totalCostByBuyerTest() {
+	public void totalCostByBuyerAndSellerTest() {
 
 		SaleTransaction saleTransactions = new SaleTransactionsImpl(purchasedBookRepository);
 
 		Buyer buyer = new Buyer();
 		buyer.setName("Шрэк");
 		buyer.setAddress("Болото");
-		buyerRepository.save(buyer);
+
+		Seller seller = new Seller();
+		seller.setName("Принц");
+		seller.setMagazine("Ярмарка");
 
 		List<String> bookTitles = Arrays.asList("Золушка", "Том и Джерри", "Серебрянное копытце", "Сын полка");
 		BigDecimal price = BigDecimal.valueOf(123.45);
@@ -256,36 +263,15 @@ public class SpringDataApplicationTests {
 			book.setTitle(title);
 			book.setYear(2012);
 			book.setDescription("Some description");
-			saleTransactions.saleTransaction(book, buyer, price);
+			saleTransactions.saleTransaction(book, buyer, seller, price);
 		}
 		assertEquals(saleTransactions.totalCostByBuyer(buyer),
 				price.multiply(BigDecimal.valueOf(bookTitles.size())));
 
-	}
-
-	@Test
-	@Transactional
-	public void totalCostBySellerTest(){
-		SaleTransaction saleTransactions = new SaleTransactionsImpl(purchasedBookRepository);
-
-		Buyer buyer = new Buyer();
-		buyer.setName("Шрэк");
-		buyer.setAddress("Болото");
-		buyerRepository.save(buyer);
-
-		List<String> bookTitles = Arrays.asList("Золушка", "Том и Джерри", "Серебрянное копытце", "Сын полка");
-		BigDecimal price = BigDecimal.valueOf(123.45);
-		for(String title : bookTitles){
-			Book book = new Book();
-			book.setTitle(title);
-			book.setYear(2012);
-			book.setDescription("Some description");
-			saleTransactions.saleTransaction(book, buyer, price);
-		}
-		assertEquals(saleTransactions.totalCostByBuyer(buyer),
+		assertEquals(saleTransactions.totalCostBySeller(seller),
 				price.multiply(BigDecimal.valueOf(bookTitles.size())));
-	}
 
+	}
 
 	@Test
 	public void testSave() {
