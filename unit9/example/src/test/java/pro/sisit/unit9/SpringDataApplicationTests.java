@@ -42,6 +42,9 @@ public class SpringDataApplicationTests {
 	private BuyerRepository buyerRepository;
 
 	@Autowired
+	private SellerRepository sellerRepository;
+
+	@Autowired
 	private PurchasedBookRepository purchasedBookRepository;
 
 	@Before
@@ -107,19 +110,26 @@ public class SpringDataApplicationTests {
 		buyer.setName("Евгений Лукашин");
 		buyer.setAddress("3-я улица строителей");
 		buyerRepository.save(buyer);
+
+		Seller seller = new Seller();
+		seller.setName("Хитрый продавец");
+		seller.setMagazine("BeerStore");
+		sellerRepository.save(seller);
+
 	}
 
 	@After
 	public void clearRepositories() {
 		authorOfBookRepository.deleteAll();
 		authorRepository.deleteAll();
+		bookRepository.deleteAll();
 		purchasedBookRepository.deleteAll();
 		buyerRepository.deleteAll();
-		bookRepository.deleteAll();
+		sellerRepository.deleteAll();
 	}
 
 	@Test
-	public void testBuyerSave() {
+	public void buyerSaveTest() {
 		boolean founded = false;
 		for (Buyer buyer : buyerRepository.findAll()) {
 			if (buyer.getAddress().equals("3-я улица строителей")
@@ -130,6 +140,49 @@ public class SpringDataApplicationTests {
 			}
 		}
 		assertTrue(founded);
+	}
+
+	@Test
+	public void sellerSaveTest(){
+		boolean founded = false;
+		for(Seller seller : sellerRepository.findAll()){
+			if(seller.getName().equals("Хитрый продавец")
+				&& seller.getMagazine().equals("BeerStore")
+				&& seller.getId() > 0){
+				founded = true;
+				break;
+			}
+		}
+		assertTrue(founded);
+	}
+
+	@Test
+	@Transactional
+	public void findPurchasedBookByTest() {
+
+		Buyer buyer = new Buyer();
+		buyer.setName("Владимир Путин");
+		buyer.setAddress("Кремль");
+
+		Seller seller = new Seller();
+		seller.setName("Дмитрий Медведев");
+		seller.setMagazine("Мавзолей");
+
+		Book targetBook = new Book();
+		targetBook.setTitle("Конституция РФ");
+		targetBook.setDescription("Фантастика");
+		targetBook.setYear(2020);
+
+		PurchasedBook purchasedBook = new PurchasedBook();
+		purchasedBook.setBook(targetBook);
+		purchasedBook.setBuyer(buyer);
+		purchasedBook.setSeller(seller);
+		purchasedBook.setCost(BigDecimal.valueOf(0.01));
+		purchasedBookRepository.save(purchasedBook);
+
+		assertEquals(1, purchasedBookRepository.findByBook(targetBook).size());
+		assertEquals(1, purchasedBookRepository.findByBuyer(buyer).size());
+		assertEquals(1, purchasedBookRepository.findBySeller(seller).size());
 	}
 
 	@Test
@@ -211,9 +264,32 @@ public class SpringDataApplicationTests {
 	}
 
 	@Test
+	@Transactional
+	public void totalCostBySellerTest(){
+		SaleTransaction saleTransactions = new SaleTransactionsImpl(purchasedBookRepository);
+
+		Buyer buyer = new Buyer();
+		buyer.setName("Шрэк");
+		buyer.setAddress("Болото");
+		buyerRepository.save(buyer);
+
+		List<String> bookTitles = Arrays.asList("Золушка", "Том и Джерри", "Серебрянное копытце", "Сын полка");
+		BigDecimal price = BigDecimal.valueOf(123.45);
+		for(String title : bookTitles){
+			Book book = new Book();
+			book.setTitle(title);
+			book.setYear(2012);
+			book.setDescription("Some description");
+			saleTransactions.saleTransaction(book, buyer, price);
+		}
+		assertEquals(saleTransactions.totalCostByBuyer(buyer),
+				price.multiply(BigDecimal.valueOf(bookTitles.size())));
+	}
+
+
+	@Test
 	public void testSave() {
-		boolean founded = false;
-		founded = bookRepository.findAll()
+		boolean founded = bookRepository.findAll()
 				.stream()
 				.filter(book -> book.getTitle().equals("Буратино"))
 				.count() == 1;

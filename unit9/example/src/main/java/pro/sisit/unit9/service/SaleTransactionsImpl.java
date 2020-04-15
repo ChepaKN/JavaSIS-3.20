@@ -6,6 +6,7 @@ import pro.sisit.unit9.data.PurchasedBookRepository;
 import pro.sisit.unit9.entity.Book;
 import pro.sisit.unit9.entity.Buyer;
 import pro.sisit.unit9.entity.PurchasedBook;
+import pro.sisit.unit9.entity.Seller;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +41,14 @@ public class SaleTransactionsImpl implements SaleTransaction{
     @Override
     public BigDecimal totalCostByBuyer (Buyer buyer) {
         return purchasedBookRepository.findByBuyer(buyer).stream()
+                .map(PurchasedBook::getCost)
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
+
+    @Override
+    public BigDecimal totalCostBySeller(Seller seller){
+        return purchasedBookRepository.findBySeller(seller)
+                .stream()
                 .map(PurchasedBook::getCost)
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
     }

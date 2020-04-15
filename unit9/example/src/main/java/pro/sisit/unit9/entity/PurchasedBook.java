@@ -22,6 +22,11 @@ public class PurchasedBook {
     @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
+
     @Column
     private BigDecimal cost;
 }
