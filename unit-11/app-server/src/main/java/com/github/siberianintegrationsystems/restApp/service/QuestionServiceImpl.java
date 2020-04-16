@@ -9,6 +9,8 @@ import com.github.siberianintegrationsystems.restApp.entity.Question;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -40,5 +42,21 @@ public class QuestionServiceImpl implements QuestionService {
 
         return new QuestionsItemDTO(question,
                 answerRepository.findByQuestion(question));
+    }
+
+    @Override
+    public QuestionsItemDTO editQuestion(QuestionsItemDTO dto){
+
+        //Удалим из базы вопрос с таким ID и ответы к нему
+        Question question = questionRepository.findById(Long.parseLong(dto.id))
+                .orElseThrow(RuntimeException::new);
+
+        questionRepository.deleteById(Long.parseLong(dto.id));
+        List<Answer> answers = answerRepository.findByQuestion(question);
+        for(Answer a : answers){
+            answerRepository.delete(a);
+        }
+        //Созданим новый вопрос и сохраним в базу
+        return createQuestion(dto);
     }
 }
