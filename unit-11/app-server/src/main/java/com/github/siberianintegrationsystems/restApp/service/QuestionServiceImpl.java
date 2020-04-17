@@ -49,7 +49,8 @@ public class QuestionServiceImpl implements QuestionService {
 
         //Удалим из базы вопрос с таким ID и ответы к нему
         Question question = questionRepository.findById(Long.parseLong(dto.id))
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("Не найден вопрос с id %s", dto.id)));
 
         questionRepository.deleteById(Long.parseLong(dto.id));
         List<Answer> answers = answerRepository.findByQuestion(question);
