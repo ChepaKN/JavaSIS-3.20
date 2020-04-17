@@ -1,6 +1,7 @@
 package com.github.siberianintegrationsystems.restApp;
 
 import com.github.siberianintegrationsystems.restApp.data.JournalRepository;
+import com.github.siberianintegrationsystems.restApp.data.SessionRepository;
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
 import com.github.siberianintegrationsystems.restApp.service.JournalServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class RestAppApplication {
 	@Autowired
 	private JournalRepository journalRepository;
 
+	@Autowired
+	private SessionRepository sessionRepository;
+
 	public static void main(String[] args) {
 		SpringApplication.run(RestAppApplication.class, args);
 	}
@@ -26,5 +30,11 @@ public class RestAppApplication {
 		journal.setName("Вопросы");
 		journal.setDefaultPageSize(15L);
 		journalRepository.save(journal);
+
+		journal.setId(JournalServiceImpl.SESSIONS_JOURNAL_ID);
+		journal.setName("Сессии");
+		journal.setDefaultPageSize(15L);
+		journalRepository.save(journal);
+
 	}
 }
