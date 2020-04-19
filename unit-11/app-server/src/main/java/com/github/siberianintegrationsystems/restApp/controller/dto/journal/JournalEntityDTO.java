@@ -1,4 +1,4 @@
-package com.github.siberianintegrationsystems.restApp.controller.dto;
+package com.github.siberianintegrationsystems.restApp.controller.dto.journal;
 
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
 

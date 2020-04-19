@@ -1,7 +1,10 @@
 package com.github.siberianintegrationsystems.restApp.service;
 
-import com.github.siberianintegrationsystems.restApp.entity.QuestionSession;
+import com.github.siberianintegrationsystems.restApp.controller.dto.session.SessionDTO;
+import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
 
 public interface SessionService {
-    QuestionSession getSession(String id);
+    SessionEvent getSession(String id);
+    String validateSession(SessionDTO sessionDTO);
+//    void saveSelectedAnswers(SessionDTO sessionDTO);
 }

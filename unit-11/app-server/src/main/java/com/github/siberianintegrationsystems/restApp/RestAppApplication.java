@@ -1,7 +1,6 @@
 package com.github.siberianintegrationsystems.restApp;
 
 import com.github.siberianintegrationsystems.restApp.data.JournalRepository;
-import com.github.siberianintegrationsystems.restApp.data.SessionRepository;
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
 import com.github.siberianintegrationsystems.restApp.service.JournalServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,8 @@ public class RestAppApplication {
 	@Autowired
 	private JournalRepository journalRepository;
 
-	@Autowired
-	private SessionRepository sessionRepository;
+//	@Autowired
+//	private SessionRepository sessionRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RestAppApplication.class, args);

@@ -1,18 +1,23 @@
 package com.github.siberianintegrationsystems.restApp.controller.dto;
 
-import java.util.List;
+import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalItemDTO;
+import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
+import java.util.Date;
 
 public class SessionItemDTO extends JournalItemDTO {
 
-    //ФИО
-    public String name;
-    //Список вопросов с выбранными(!) ответами
-    public List<QuestionsItemDTO> questionsItemDTOList;
+    public String   name;
+    public Date     insertDate;
+    public Double   result;
 
-    public SessionItemDTO(String name, List<QuestionsItemDTO> questionsItemDTOList) {
-        this.name = name;
-        this.questionsItemDTOList = questionsItemDTOList;
+    public SessionItemDTO(){
+
     }
 
-
+    public SessionItemDTO(SessionEvent sessionEvent){
+        this.id = sessionEvent.getId().toString();
+        this.name = sessionEvent.getName();
+        this.insertDate = sessionEvent.getSessionTime();
+        this.result = sessionEvent.getPercent();
+    }
 }

@@ -1,7 +1,7 @@
 package com.github.siberianintegrationsystems.restApp.service;
 
-import com.github.siberianintegrationsystems.restApp.controller.dto.JournalItemDTO;
-import com.github.siberianintegrationsystems.restApp.controller.dto.JournalRequestDTO;
+import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalItemDTO;
+import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalRequestDTO;
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
 
 import java.util.List;
