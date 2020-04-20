@@ -6,6 +6,7 @@ import {QuestionJournalItem} from "../../../model/question-journal-item.model";
 import {SessionResultDialogComponent} from "../session-result-dialog/session-result-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-new-session',
@@ -45,7 +46,7 @@ export class NewSessionComponent implements OnInit, OnDestroy {
   }
 
   private fillQuestions() {
-    this.questions$ = this.service.getQuestionsForNewSession();
+    this.questions$ = this.service.getQuestionsForNewSession().pipe(shareReplay(1));
     this.formSubscription = this.questions$.subscribe(questions => this.fillFormGroups(questions));
   }
 
