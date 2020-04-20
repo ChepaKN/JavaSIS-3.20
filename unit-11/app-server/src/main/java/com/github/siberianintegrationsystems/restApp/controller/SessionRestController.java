@@ -5,11 +5,14 @@ import com.github.siberianintegrationsystems.restApp.controller.dto.QuestionsIte
 import com.github.siberianintegrationsystems.restApp.controller.dto.session.SessionDTO;
 import com.github.siberianintegrationsystems.restApp.data.AnswerRepository;
 import com.github.siberianintegrationsystems.restApp.data.QuestionRepository;
+import com.github.siberianintegrationsystems.restApp.entity.Answer;
 import com.github.siberianintegrationsystems.restApp.entity.Question;
 import com.github.siberianintegrationsystems.restApp.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,11 +46,21 @@ public class SessionRestController {
     @GetMapping("session/questions-new")
     public List<QuestionsItemDTO> getQuestionsForSession(){
 
+
         //todo: перенести логику в сервис
-        List<Question> questionList = questionRepository.findRandQuestions();
-        return questionList.stream()
-                .map(question -> new QuestionsItemDTO(question,
-                        answerRepository.findByQuestion(question)))
+        return questionRepository.findRandQuestions()
+                .stream()
+                .map(question -> {
+                    //перемешаем ответы
+                    // todo: (как то не очень, переделать бы...)
+                    List<Answer> answers = answerRepository.findByQuestion(question);
+                    Collections.shuffle(answers);
+                    //Сотрем правильные ответы
+                    answers.forEach(answer -> answer.setCorrect(false));
+                    return new QuestionsItemDTO(question,
+                            answers);
+                    }
+                )
                 .collect(Collectors.toList());
     }
 
