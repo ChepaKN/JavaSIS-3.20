@@ -9,13 +9,12 @@ import com.github.siberianintegrationsystems.restApp.data.SelectedAnswerReposito
 import com.github.siberianintegrationsystems.restApp.data.SessionEventRepository;
 import com.github.siberianintegrationsystems.restApp.entity.Answer;
 import com.github.siberianintegrationsystems.restApp.entity.Question;
+import com.github.siberianintegrationsystems.restApp.entity.SelectedAnswer;
 import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -25,19 +24,19 @@ import java.util.stream.Collectors;
 public class SessionServiceImpl implements SessionService {
 
     private SessionEventRepository sessionEventRepository;
-    private SelectedAnswerRepository selectedAnswerRepository;
     private QuestionRepository questionRepository;
     private AnswerRepository answerRepository;
+    private SelectedAnswerRepository selectedAnswerRepository;
 
 
     public SessionServiceImpl(SessionEventRepository sessionEventRepository,
-                              SelectedAnswerRepository selectedAnswerRepository,
                               QuestionRepository questionRepository,
-                              AnswerRepository answerRepository) {
+                              AnswerRepository answerRepository,
+                              SelectedAnswerRepository selectedAnswerRepository) {
         this.sessionEventRepository = sessionEventRepository;
-        this.selectedAnswerRepository = selectedAnswerRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.selectedAnswerRepository = selectedAnswerRepository;
     }
 
 
@@ -82,25 +81,33 @@ public class SessionServiceImpl implements SessionService {
         }
         return Math.max(0, k/m - w/(n-m));
     }
+
     @Override
     public String validateSession(SessionDTO sessionDTO){
+
         Double result = sessionDTO.questionsList.stream()
                 .map(this::validateOneQuestion).reduce(0.0, Double::sum);
 
         result = result / sessionDTO.questionsList.size() * 100.0;
 
         //сохраним сессию
-        sessionEventRepository.save(new SessionEvent(sessionDTO.name, result));
+        SessionEvent sessionEvent = new SessionEvent(sessionDTO.name, result);
+        sessionEventRepository.save(sessionEvent);
 
         //сохраним выбранные ответы
-        List<AnswerSessionDTO> answerSessionDTOS = new ArrayList<>();
-
-        for(QuestionSessionDTO q : sessionDTO.questionsList) {
-            answerSessionDTOS.addAll(q
-                    .answersList.stream()
+        List<Answer> answers = new ArrayList<>();
+        for(QuestionSessionDTO q : sessionDTO.questionsList){
+            answers.addAll(q.answersList.stream()
                     .filter(answerSessionDTO -> answerSessionDTO.isSelected)
+                    .map(answerSessionDTO -> answerRepository.findById(Long.parseLong(answerSessionDTO.id))
+                            .orElseThrow(RuntimeException::new))
                     .collect(Collectors.toList()));
         }
+
+        for (Answer a : answers){
+            selectedAnswerRepository.save(new SelectedAnswer(a, sessionEvent));
+        }
+
         //Locale.US для того чтобы при преобразовании в строку разделитель был точкой а не запятой, иначе клиент ругается
         return String.format(Locale.US, "%.2f", result);
     }

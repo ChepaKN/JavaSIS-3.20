@@ -13,19 +13,9 @@ public class SelectedAnswer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private SessionEvent sessionEvent;
 
-    public Answer getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(Answer answer) {
+    public SelectedAnswer(Answer answer, SessionEvent sessionEvent){
         this.answer = answer;
-    }
-
-    public SessionEvent getSessionEvent() {
-        return sessionEvent;
-    }
-
-    public void setSessionEvent(SessionEvent sessionEvent) {
         this.sessionEvent = sessionEvent;
     }
+
 }
