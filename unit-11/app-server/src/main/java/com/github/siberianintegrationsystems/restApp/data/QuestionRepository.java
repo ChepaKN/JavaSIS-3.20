@@ -1,7 +1,6 @@
 package com.github.siberianintegrationsystems.restApp.data;
 
 import com.github.siberianintegrationsystems.restApp.entity.Question;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

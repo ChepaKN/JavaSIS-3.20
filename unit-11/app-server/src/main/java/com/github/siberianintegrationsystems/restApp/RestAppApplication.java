@@ -15,9 +15,6 @@ public class RestAppApplication {
 	@Autowired
 	private JournalRepository journalRepository;
 
-//	@Autowired
-//	private SessionRepository sessionRepository;
-
 	public static void main(String[] args) {
 		SpringApplication.run(RestAppApplication.class, args);
 	}

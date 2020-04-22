@@ -2,8 +2,6 @@ package com.github.siberianintegrationsystems.restApp.controller.dto;
 
 import com.github.siberianintegrationsystems.restApp.entity.Answer;
 
-import javax.persistence.MappedSuperclass;
-
 
 
 public class AnswerItemDTO {

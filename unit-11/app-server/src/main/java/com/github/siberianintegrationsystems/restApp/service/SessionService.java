@@ -6,5 +6,4 @@ import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
 public interface SessionService {
     SessionEvent getSession(String id);
     String validateSession(SessionDTO sessionDTO);
-//    void saveSelectedAnswers(SessionDTO sessionDTO);
 }

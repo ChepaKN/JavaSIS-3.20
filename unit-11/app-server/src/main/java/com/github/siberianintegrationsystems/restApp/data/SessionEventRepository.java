@@ -1,6 +1,5 @@
 package com.github.siberianintegrationsystems.restApp.data;
 
-import com.github.siberianintegrationsystems.restApp.entity.Question;
 import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
 import org.springframework.data.repository.CrudRepository;
 

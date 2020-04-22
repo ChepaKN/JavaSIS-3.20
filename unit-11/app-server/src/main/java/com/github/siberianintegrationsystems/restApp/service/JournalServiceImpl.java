@@ -10,13 +10,9 @@ import com.github.siberianintegrationsystems.restApp.data.QuestionRepository;
 import com.github.siberianintegrationsystems.restApp.data.SessionEventRepository;
 import com.github.siberianintegrationsystems.restApp.entity.BaseEntity;
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
-import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,16 +28,13 @@ public class JournalServiceImpl implements JournalService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final SessionEventRepository sessionEventRepository;
-//    private final SessionRepository sessionRepository;
 
     public JournalServiceImpl(JournalRepository journalRepository,
                               QuestionRepository questionRepository,
                               AnswerRepository answerRepository, SessionEventRepository sessionEventRepository) {
-//                              SessionRepository sessionRepository) {
         this.journalRepository = journalRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
-//        this.sessionRepository = sessionRepository;
         this.sessionEventRepository = sessionEventRepository;
     }
 
@@ -73,16 +66,6 @@ public class JournalServiceImpl implements JournalService {
                         sessionEventRepository::findByNameContainingIgnoreCase,
                         SessionItemDTO::new);
                 break;
-
-
-//                List<SessionEvent> sessionEventList = sessionEventRepository
-//                        .findByNameContainingIgnoreCase(req.search);
-//
-//                SessionItemDTO sessionItemDTO = new SessionItemDTO(sessionEventList.get(0));
-//                collection = Arrays.asList(sessionItemDTO);
-////                collection = sessionEventList.stream()
-////                        .map(SessionItemDTO::new)
-////                        .collect(Collectors.toList());
 
             default:
                 throw new RuntimeException();

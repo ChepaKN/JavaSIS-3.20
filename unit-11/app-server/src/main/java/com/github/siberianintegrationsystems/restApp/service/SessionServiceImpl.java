@@ -57,15 +57,19 @@ public class SessionServiceImpl implements SessionService {
                 .filter(Answer::getCorrect)
                 .count();
 
+        if(m == 0) {
+            throw new RuntimeException(
+                    String.format("Не найден правильный ответ для вопроса с id: %d",
+                            question.getId()));
+        }
+
         //верно выбранных
         double k = 0;
         //неверно выбранных
         double w = 0;
         List<AnswerSessionDTO> selectedAnswers = questionSessionDTO.answersList;
 
-//        for(int i = 0; i < n; i++){
         for(AnswerSessionDTO selectedAns : selectedAnswers){
-//            AnswerSessionDTO selectedAns = selectedAnswers.get(i);
             Answer savedAns = answerRepository.findById(Long.parseLong(selectedAns.id))
                     .orElseThrow(() -> new RuntimeException(
                             String.format("Не найден ответ с id: %s", selectedAns.id)));
