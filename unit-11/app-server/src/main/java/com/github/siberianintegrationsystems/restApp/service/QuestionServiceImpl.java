@@ -32,18 +32,15 @@ public class QuestionServiceImpl implements QuestionService {
         question.setName(dto.name);
         questionRepository.save(question);
 
-//        List<Answer> answerList = new ArrayList<>();
         for (AnswerItemDTO answerDTO : dto.answers) {
             Answer answer = new Answer();
             answer.setName(answerDTO.answerText);
             answer.setCorrect(answerDTO.isCorrect);
             answer.setQuestion(question);
-//            answerList.add(answer);
             answerRepository.save(answer);
         }
 
         return new QuestionsItemDTO(question,
-//                answerList);
                 answerRepository.findByQuestion(question));
     }
 
@@ -82,19 +79,26 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<QuestionsItemDTO> getQuestionsForSession(){
 
-        return questionRepository.findRandQuestions()
-            .stream()
-            .map(question -> {
-                        //перемешаем ответы
-                        // todo: (как то не очень, переделать бы...)
-                        List<Answer> answers = answerRepository.findByQuestion(question);
-                        Collections.shuffle(answers);
-//                        //Сотрем правильные ответы
-//                        answers.forEach(answer -> answer.setCorrect(false));
-                        return new QuestionsItemDTO(question,
-                                answers);
-                    }
-            )
-            .collect(Collectors.toList());
+
+        List<QuestionsItemDTO> questionsItemDTOList =
+                questionRepository.findRandQuestions()
+                    .stream()
+                    .map(question -> {
+                                //перемешаем ответы
+                                // todo: (как то не очень, переделать бы...)
+                                List<Answer> answers = answerRepository.findByQuestion(question);
+                                Collections.shuffle(answers);
+                                return new QuestionsItemDTO(question,
+                                        answers);
+                            }
+                    )
+                    .collect(Collectors.toList());
+
+        //Скроем правильные ответы от хитрых пользователей
+        questionsItemDTOList
+                .forEach(questionsItemDTO -> questionsItemDTO.answers
+                        .forEach(answerItemDTO -> answerItemDTO.isCorrect = false));
+
+        return questionsItemDTOList;
     }
 }
