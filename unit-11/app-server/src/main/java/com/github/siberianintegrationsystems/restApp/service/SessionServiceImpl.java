@@ -61,6 +61,10 @@ public class SessionServiceImpl implements SessionService {
             throw new RuntimeException(
                     String.format("Не найден правильный ответ для вопроса с id: %d",
                             question.getId()));
+        }else if(n == m){
+            throw new RuntimeException(
+                    String.format("Все ответы на вопрос с id: %d верные",
+                            question.getId()));
         }
 
         //верно выбранных
@@ -114,10 +118,5 @@ public class SessionServiceImpl implements SessionService {
 
         //Locale.US для того чтобы при преобразовании в строку разделитель был точкой а не запятой, иначе клиент ругается
         return String.format(Locale.US, "%.2f", result);
-    }
-
-    @Override
-    public SessionEvent getSession(String id) {
-        return null;
     }
 }

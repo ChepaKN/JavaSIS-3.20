@@ -30,3 +30,9 @@ out/
 
 ### VS Code ###
 .vscode/
+/data/113myrestprog.mv.db
+/data/113myrestprog.trace.db
+/data/113restapp_data_base.mv.db
+/data/114myrestprog.mv.db
+/data/114myrestprog.trace.db
+/data/myrestprog.trace.db
