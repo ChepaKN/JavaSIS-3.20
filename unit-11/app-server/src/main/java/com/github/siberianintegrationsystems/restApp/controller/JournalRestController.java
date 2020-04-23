@@ -7,6 +7,7 @@ import com.github.siberianintegrationsystems.restApp.controller.dto.journal.Jour
 import com.github.siberianintegrationsystems.restApp.service.JournalService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,7 +31,6 @@ public class JournalRestController {
                                     @RequestBody JournalRequestDTO req) {
         List<? extends JournalItemDTO> collect =
                 journalService.getJournalRows(id, req);
-
         return new JournalResultDTO(collect.size(), collect);
     }
 }

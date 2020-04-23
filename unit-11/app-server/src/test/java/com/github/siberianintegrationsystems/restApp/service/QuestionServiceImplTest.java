@@ -34,6 +34,9 @@ public class QuestionServiceImplTest {
 
     @Before
     public void init(){
+        QuestionsItemDTO questionsItemDTO = new QuestionsItemDTO();
+        questionsItemDTO.name = "Сколько ног у Паука";
+
         Answer answer1 = new Answer();
         answer1.setName("8");
         answer1.setCorrect(true);
@@ -47,8 +50,6 @@ public class QuestionServiceImplTest {
         AnswerItemDTO answerItemDTO1 = new AnswerItemDTO(answer1);
         AnswerItemDTO answerItemDTO2 = new AnswerItemDTO(answer2);
 
-        QuestionsItemDTO questionsItemDTO = new QuestionsItemDTO();
-        questionsItemDTO.name = "Сколько ног у Паука";
         questionsItemDTO.answers = Arrays.asList(answerItemDTO1, answerItemDTO2);
 
         QuestionsItemDTO createdQuestion = questionService.createQuestion(questionsItemDTO);

@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@SpringBootTest(properties = {"spring.config.name=myapp-test-h2","myapp.trx.datasource.url=jdbc:h2:mem:trxServiceStatus"})
 @Transactional
 public class SessionServiceImplTest {
 
@@ -32,12 +31,6 @@ public class SessionServiceImplTest {
     private AnswerRepository answerRepository;
     @Autowired
     private SessionService sessionService;
-
-    private long id;
-    @Before
-    public void initialization(){
-
-    }
 
     @Test
     public void validateOneQuestionTest() {
