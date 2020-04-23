@@ -9,8 +9,12 @@ import pro.sisit.unit9.entity.Book;
 
 import java.util.List;
 
-public interface BookRepository extends CrudRepository<Book, Long>, PagingAndSortingRepository<Book, Long>,
-        JpaRepository<Book, Long>, JpaSpecificationExecutor<Book>, BookComplexQueryRepository {
+public interface BookRepository extends CrudRepository<Book, Long>,
+        PagingAndSortingRepository<Book, Long>,
+        JpaRepository<Book, Long>,
+        JpaSpecificationExecutor<Book>,
+        BookComplexQueryRepository {
+
     List<Book> findByYear(Integer year);
 
     @Query("select aob.book from "
