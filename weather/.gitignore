@@ -33,4 +33,4 @@ out/
 
 *.gz
 *.log
-*.db
+/data/
