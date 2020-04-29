@@ -56,17 +56,7 @@ public class SessionServiceImpl implements SessionService {
                 .stream()
                 .filter(Answer::getCorrect)
                 .count();
-/*
-        if(rightAnswersCount == 0) {
-            throw new RuntimeException(
-                    String.format("Не найден правильный ответ для вопроса с id: %d",
-                            question.getId()));
-        }else if(answersCount == rightAnswersCount){
-            throw new RuntimeException(
-                    String.format("Все ответы на вопрос с id: %d верные",
-                            question.getId()));
-        }
-*/
+
         //верно выбранных
         double selectedRightCount = 0;
         //неверно выбранных
@@ -110,20 +100,15 @@ public class SessionServiceImpl implements SessionService {
         sessionEventRepository.save(sessionEvent);
 
         //сохраним выбранные ответы
-        List<Answer> answers = new ArrayList<>();
-        for(QuestionSessionDTO q : sessionDTO.questionsList){
-            answers.addAll(q.answersList.stream()
-                    .filter(answerSessionDTO -> answerSessionDTO.isSelected)
-                    .map(answerSessionDTO -> answerRepository.findById(Long.parseLong(answerSessionDTO.id))
-                            .orElseThrow(RuntimeException::new))
-                    .collect(Collectors.toList()));
-        }
+        sessionDTO.questionsList
+                .forEach((q -> q.answersList.stream()
+                                                .filter(answerSessionDTO -> answerSessionDTO.isSelected)
+                                                .map(answerSessionDTO -> answerRepository.findById(Long.parseLong(answerSessionDTO.id))
+                                                    .orElseThrow(RuntimeException::new))
+                                                .forEach(a -> selectedAnswerRepository
+                                                        .save(new SelectedAnswer(a, sessionEvent)))));
 
-        for (Answer a : answers){
-            selectedAnswerRepository.save(new SelectedAnswer(a, sessionEvent));
-        }
-
-        //Locale.US для того чтобы при преобразовании в строку разделитель был точкой а не запятой, иначе клиент ругается
-        return String.format(Locale.US, "%.2f", result);
+        return String.format("%.2f", result)
+                .replace(",", ".");
     }
 }

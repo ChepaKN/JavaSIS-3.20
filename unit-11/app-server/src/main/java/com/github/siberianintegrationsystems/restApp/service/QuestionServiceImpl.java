@@ -26,10 +26,14 @@ public class QuestionServiceImpl implements QuestionService {
         this.answerRepository = answerRepository;
     }
 
-    //Хоть клиет и не позволит создать вопрос не указав верный ответ, проверка лишней не будет
-    private void checkCorrectAnswersForQuestion(QuestionsItemDTO dto){
-        if(dto.answers.stream().noneMatch(answerItemDTO -> answerItemDTO.isCorrect)){
-            throw new RuntimeException("Не указан ни один верный ответ!");
+    //Хоть клиет и не позволит так сделать, проверка лишней не будет
+    private void checkAnswersForQuestion(QuestionsItemDTO dto){
+        if (dto.answers == null) {
+            throw new RuntimeException("Не указан ни один ответ к вопросу!");
+        } else {
+            if (dto.answers.stream().noneMatch(answerItemDTO -> answerItemDTO.isCorrect)) {
+                throw new RuntimeException("Не указан ни один верный ответ!");
+            }
         }
     }
 
@@ -37,7 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionsItemDTO createQuestion(QuestionsItemDTO dto) {
 
         //Указал ли клиет верный ответ
-        checkCorrectAnswersForQuestion(dto);
+        checkAnswersForQuestion(dto);
 
         Question question = new Question();
         question.setName(dto.name);
@@ -59,7 +63,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionsItemDTO editQuestion(QuestionsItemDTO dto){
 
         //Указал ли клиет верный ответ
-        checkCorrectAnswersForQuestion(dto);
+        checkAnswersForQuestion(dto);
 
         //Найдем вопрос с таким ID
         Question question = questionRepository.findById(Long.parseLong(dto.id))
