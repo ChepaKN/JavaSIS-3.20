@@ -28,7 +28,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     //Хоть клиет и не позволит так сделать, проверка лишней не будет
     private void checkAnswersForQuestion(QuestionsItemDTO dto){
-        if (dto.answers == null) {
+        if (dto.answers == null || dto.answers.isEmpty()) {
             throw new RuntimeException("Не указан ни один ответ к вопросу!");
         } else {
             if (dto.answers.stream().noneMatch(answerItemDTO -> answerItemDTO.isCorrect)) {
