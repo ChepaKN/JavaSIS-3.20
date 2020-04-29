@@ -41,36 +41,36 @@ public class SessionServiceImpl implements SessionService {
 
 
 
+    //Метод возвращает результат валидирования одного вопроса в диапазоне [0:1]
     private double validateOneQuestion(QuestionSessionDTO questionSessionDTO){
-        //Результат в диапазоне [0:1]
         Question question = questionRepository
                 .findById(Long.parseLong(questionSessionDTO.id))
                 .orElseThrow(() ->
-                        new RuntimeException(String.format("Не найдем вопрос с id%s",
+                        new RuntimeException(String.format("Не найден вопрос с id: %s",
                                 questionSessionDTO.id)));
 
         //всего ответов
-        double n = questionSessionDTO.answersList.size();
+        double answersCount = questionSessionDTO.answersList.size();
         //всего верных для этого вопроса
-        double m = answerRepository.findByQuestion(question)
+        double rightAnswersCount = answerRepository.findByQuestion(question)
                 .stream()
                 .filter(Answer::getCorrect)
                 .count();
-
-        if(m == 0) {
+/*
+        if(rightAnswersCount == 0) {
             throw new RuntimeException(
                     String.format("Не найден правильный ответ для вопроса с id: %d",
                             question.getId()));
-        }else if(n == m){
+        }else if(answersCount == rightAnswersCount){
             throw new RuntimeException(
                     String.format("Все ответы на вопрос с id: %d верные",
                             question.getId()));
         }
-
+*/
         //верно выбранных
-        double k = 0;
+        double selectedRightCount = 0;
         //неверно выбранных
-        double w = 0;
+        double selectedWrongCount = 0;
         List<AnswerSessionDTO> selectedAnswers = questionSessionDTO.answersList;
 
         for(AnswerSessionDTO selectedAns : selectedAnswers){
@@ -80,14 +80,21 @@ public class SessionServiceImpl implements SessionService {
 
             if(selectedAns.isSelected){
                 if(savedAns.getCorrect()){
-                    k++;
+                    selectedRightCount++;
                 }else{
-                    w++;
+                    selectedWrongCount++;
                 }
             }
-            //todo: как быть с невыбранными верными ответами?
         }
-        return Math.max(0, k/m - w/(n-m));
+
+        double result;
+        //Для избежания деления на 0, если вдруг все ответы верные
+        if(answersCount == rightAnswersCount){
+            result = Math.max(0, selectedRightCount/rightAnswersCount - selectedWrongCount);
+        }else{
+            result=  Math.max(0, selectedRightCount/rightAnswersCount - selectedWrongCount/(answersCount-rightAnswersCount));
+        }
+        return result;
     }
 
     @Override
