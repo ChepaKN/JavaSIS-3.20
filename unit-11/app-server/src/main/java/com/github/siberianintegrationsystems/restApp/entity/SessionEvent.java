@@ -2,14 +2,13 @@ package com.github.siberianintegrationsystems.restApp.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 public class SessionEvent extends BaseEntity {
 
 
     @Column
-    private Date date;
+    private LocalDateTime date;
 
     @Column
     private String name;
@@ -24,10 +23,10 @@ public class SessionEvent extends BaseEntity {
     public SessionEvent(String name, Double percent) {
         this.name = name;
         this.percent = percent;
-        date = new Date();
+        date = LocalDateTime.now();
     }
 
-    public Date getSessionTime() {
+    public LocalDateTime getSessionTime() {
         return date;
     }
 

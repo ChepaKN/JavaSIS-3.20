@@ -46,7 +46,7 @@ public class JournalServiceImplTest {
     }
 
     @Test
-    public void getJournal() {
+    public void getJournalTest() {
 
         assertTrue(journalRepository.existsById(journalID));
         assertEquals(journalName, journalService.getJournal(journalID).getName());
@@ -54,7 +54,7 @@ public class JournalServiceImplTest {
     }
 
     @Test
-    public void getJournalRows() {
+    public void getJournalRowsTest() {
 
         final String questionName = "Вопрос 1";
 

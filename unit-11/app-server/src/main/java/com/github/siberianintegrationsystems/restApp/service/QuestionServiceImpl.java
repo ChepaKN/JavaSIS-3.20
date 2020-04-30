@@ -26,8 +26,22 @@ public class QuestionServiceImpl implements QuestionService {
         this.answerRepository = answerRepository;
     }
 
+    //Хоть клиет и не позволит так сделать, проверка лишней не будет
+    private void checkAnswersForQuestion(QuestionsItemDTO dto){
+        if (dto.answers == null || dto.answers.isEmpty()) {
+            throw new RuntimeException("Не указан ни один ответ к вопросу!");
+        } else {
+            if (dto.answers.stream().noneMatch(answerItemDTO -> answerItemDTO.isCorrect)) {
+                throw new RuntimeException("Не указан ни один верный ответ!");
+            }
+        }
+    }
+
     @Override
     public QuestionsItemDTO createQuestion(QuestionsItemDTO dto) {
+
+        checkAnswersForQuestion(dto);
+
         Question question = new Question();
         question.setName(dto.name);
         questionRepository.save(question);
@@ -46,6 +60,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionsItemDTO editQuestion(QuestionsItemDTO dto){
+
+        checkAnswersForQuestion(dto);
 
         //Найдем вопрос с таким ID
         Question question = questionRepository.findById(Long.parseLong(dto.id))
@@ -85,7 +101,6 @@ public class QuestionServiceImpl implements QuestionService {
                     .stream()
                     .map(question -> {
                                 //перемешаем ответы
-                                // todo: (как то не очень, переделать бы...)
                                 List<Answer> answers = answerRepository.findByQuestion(question);
                                 Collections.shuffle(answers);
                                 return new QuestionsItemDTO(question,

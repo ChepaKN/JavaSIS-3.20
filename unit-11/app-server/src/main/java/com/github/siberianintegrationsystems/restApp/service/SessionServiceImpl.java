@@ -41,36 +41,26 @@ public class SessionServiceImpl implements SessionService {
 
 
 
+    //Метод возвращает результат валидирования одного вопроса в диапазоне [0:1]
     private double validateOneQuestion(QuestionSessionDTO questionSessionDTO){
-        //Результат в диапазоне [0:1]
         Question question = questionRepository
                 .findById(Long.parseLong(questionSessionDTO.id))
                 .orElseThrow(() ->
-                        new RuntimeException(String.format("Не найдем вопрос с id%s",
+                        new RuntimeException(String.format("Не найден вопрос с id: %s",
                                 questionSessionDTO.id)));
 
         //всего ответов
-        double n = questionSessionDTO.answersList.size();
+        double answersCount = questionSessionDTO.answersList.size();
         //всего верных для этого вопроса
-        double m = answerRepository.findByQuestion(question)
+        double rightAnswersCount = answerRepository.findByQuestion(question)
                 .stream()
                 .filter(Answer::getCorrect)
                 .count();
 
-        if(m == 0) {
-            throw new RuntimeException(
-                    String.format("Не найден правильный ответ для вопроса с id: %d",
-                            question.getId()));
-        }else if(n == m){
-            throw new RuntimeException(
-                    String.format("Все ответы на вопрос с id: %d верные",
-                            question.getId()));
-        }
-
         //верно выбранных
-        double k = 0;
+        double rightSelectedCount = 0;
         //неверно выбранных
-        double w = 0;
+        double wrongSelectedCount = 0;
         List<AnswerSessionDTO> selectedAnswers = questionSessionDTO.answersList;
 
         for(AnswerSessionDTO selectedAns : selectedAnswers){
@@ -80,18 +70,30 @@ public class SessionServiceImpl implements SessionService {
 
             if(selectedAns.isSelected){
                 if(savedAns.getCorrect()){
-                    k++;
+                    rightSelectedCount++;
                 }else{
-                    w++;
+                    wrongSelectedCount++;
                 }
             }
-            //todo: как быть с невыбранными верными ответами?
         }
-        return Math.max(0, k/m - w/(n-m));
+
+        double result;
+        //Для избежания деления на 0, если вдруг все ответы верные
+        if(answersCount == rightAnswersCount){
+            result = Math.max(0, rightSelectedCount/rightAnswersCount - wrongSelectedCount);
+        }else{
+            result=  Math.max(0, rightSelectedCount/rightAnswersCount - wrongSelectedCount/(answersCount-rightAnswersCount));
+        }
+        return result;
     }
 
     @Override
     public String validateSession(SessionDTO sessionDTO){
+
+        //Вдруг с клиента прилетела пустая сессия (без вопросов)
+        if(sessionDTO.questionsList.isEmpty()){
+            throw new RuntimeException("В сохраняемой сессии нет ни одного вопроса!");
+        }
 
         Double result = sessionDTO.questionsList.stream()
                 .map(this::validateOneQuestion).reduce(0.0, Double::sum);
@@ -103,20 +105,15 @@ public class SessionServiceImpl implements SessionService {
         sessionEventRepository.save(sessionEvent);
 
         //сохраним выбранные ответы
-        List<Answer> answers = new ArrayList<>();
-        for(QuestionSessionDTO q : sessionDTO.questionsList){
-            answers.addAll(q.answersList.stream()
-                    .filter(answerSessionDTO -> answerSessionDTO.isSelected)
-                    .map(answerSessionDTO -> answerRepository.findById(Long.parseLong(answerSessionDTO.id))
-                            .orElseThrow(RuntimeException::new))
-                    .collect(Collectors.toList()));
-        }
+        sessionDTO.questionsList
+                .forEach((q -> q.answersList.stream()
+                                                .filter(answerSessionDTO -> answerSessionDTO.isSelected)
+                                                .map(answerSessionDTO -> answerRepository.findById(Long.parseLong(answerSessionDTO.id))
+                                                    .orElseThrow(RuntimeException::new))
+                                                .forEach(a -> selectedAnswerRepository
+                                                        .save(new SelectedAnswer(a, sessionEvent)))));
 
-        for (Answer a : answers){
-            selectedAnswerRepository.save(new SelectedAnswer(a, sessionEvent));
-        }
-
-        //Locale.US для того чтобы при преобразовании в строку разделитель был точкой а не запятой, иначе клиент ругается
-        return String.format(Locale.US, "%.2f", result);
+        return String.format("%.2f", result)
+                .replace(",", ".");
     }
 }

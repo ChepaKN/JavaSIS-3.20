@@ -11,8 +11,7 @@ public interface QuestionRepository
 
     List<Question> findByNameContainingIgnoreCase(String search);
 
-    //todo: как бы вынести эту константу в настройки
-    int questionsPerSession = 2;
+    int questionsPerSession = 5;
     @Query(value = "SELECT * FROM QUESTION ORDER BY RAND() LIMIT " +
             questionsPerSession, nativeQuery = true)
     List<Question> findRandQuestions();

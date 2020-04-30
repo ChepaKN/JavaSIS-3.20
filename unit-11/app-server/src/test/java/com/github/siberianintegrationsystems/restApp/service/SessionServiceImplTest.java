@@ -7,7 +7,6 @@ import com.github.siberianintegrationsystems.restApp.data.AnswerRepository;
 import com.github.siberianintegrationsystems.restApp.data.QuestionRepository;
 import com.github.siberianintegrationsystems.restApp.entity.Answer;
 import com.github.siberianintegrationsystems.restApp.entity.Question;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

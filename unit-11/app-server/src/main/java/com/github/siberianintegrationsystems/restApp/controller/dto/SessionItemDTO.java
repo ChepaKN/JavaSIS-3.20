@@ -2,12 +2,13 @@ package com.github.siberianintegrationsystems.restApp.controller.dto;
 
 import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalItemDTO;
 import com.github.siberianintegrationsystems.restApp.entity.SessionEvent;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 public class SessionItemDTO extends JournalItemDTO {
 
     public String   name;
-    public Date     insertDate;
+    public LocalDateTime insertDate;
     public Double   result;
 
     public SessionItemDTO(){

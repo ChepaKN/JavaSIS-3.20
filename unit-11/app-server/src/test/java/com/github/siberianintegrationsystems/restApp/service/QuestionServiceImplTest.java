@@ -82,20 +82,20 @@ public class QuestionServiceImplTest {
     @Test
     public void createAndEditQuestionTest() {
         Answer answer1 = new Answer();
-        answer1.setName("8");
-        answer1.setCorrect(true);
+        answer1.setName("Синее");
+        answer1.setCorrect(false);
         answerRepository.save(answer1);
 
         Answer answer2 = new Answer();
-        answer2.setName("16");
-        answer2.setCorrect(false);
+        answer2.setName("Серое");
+        answer2.setCorrect(true);
         answerRepository.save(answer2);
 
         AnswerItemDTO answerItemDTO1 = new AnswerItemDTO(answer1);
         AnswerItemDTO answerItemDTO2 = new AnswerItemDTO(answer2);
 
         QuestionsItemDTO questionsItemDTO = new QuestionsItemDTO();
-        questionsItemDTO.name = "Сколько ног у Паука";
+        questionsItemDTO.name = "Какого цвета небо в Красноярске";
         questionsItemDTO.answers = Arrays.asList(answerItemDTO1, answerItemDTO2);
 
         QuestionsItemDTO createdQuestion = questionService.createQuestion(questionsItemDTO);
@@ -122,10 +122,30 @@ public class QuestionServiceImplTest {
         List<QuestionsItemDTO> questionsItemDTOList = questionService.getQuestionsForSession();
         assertNotNull(questionsItemDTOList);
 
-        //все ответы к вопросу должны быть false;
+        /*
+            Все ответы к вопросу должны быть false, т.к. при отправке списка вопросов на клиент
+            isCorrect для каждого ответа устанавливаются в false
+         */
         for(QuestionsItemDTO q : questionsItemDTOList){
             long size = q.answers.stream().filter(a -> a.isCorrect).count();
             assertEquals(0, size);
         }
+    }
+
+    //Что-то мне подсказывает, что это плохая практика
+    @Test (expected = RuntimeException.class)
+    public void saveQuestionWithEmptyAnswersListTest(){
+        try {
+            //Вопрос без ответа
+            QuestionsItemDTO questionsItemDTO = new QuestionsItemDTO();
+            questionsItemDTO.name = "Откуда берутся люди с опытом, если на работу без опыта не берут?";
+            questionService.createQuestion(questionsItemDTO);
+        }
+        catch(RuntimeException re) {
+            String message = "Не указан ни один ответ к вопросу!";
+            assertEquals(message, re.getMessage());
+            throw re;
+        }
+        fail("Не перехвачено исключение при создании вопроса без ответа");
     }
 }

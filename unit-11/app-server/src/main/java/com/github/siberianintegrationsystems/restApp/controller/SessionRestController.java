@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("api")
+@RequestMapping("api/session")
 public class SessionRestController {
 
     public SessionRestController(SessionService sessionService,
@@ -22,12 +22,13 @@ public class SessionRestController {
     private SessionService sessionService;
     private QuestionService questionService;
 
-    @GetMapping("session/questions-new")
+    @GetMapping("questions-new")
     public List<QuestionsItemDTO> getQuestionsForSession(){
         return questionService.getQuestionsForSession();
     }
 
-    @PostMapping("session")
+    //Post запрос по URL "api/session" прилетит сюда
+    @PostMapping
     String saveSession(@RequestBody SessionDTO sessionDTO){
         return sessionService.validateSession(sessionDTO);
     }
