@@ -1,11 +1,13 @@
 package com.github.siberianintegrationsystems.restApp.service;
 
-import com.github.siberianintegrationsystems.restApp.controller.dto.JournalItemDTO;
-import com.github.siberianintegrationsystems.restApp.controller.dto.JournalRequestDTO;
+import com.github.siberianintegrationsystems.restApp.controller.dto.SessionItemDTO;
+import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalItemDTO;
+import com.github.siberianintegrationsystems.restApp.controller.dto.journal.JournalRequestDTO;
 import com.github.siberianintegrationsystems.restApp.controller.dto.QuestionsItemDTO;
 import com.github.siberianintegrationsystems.restApp.data.AnswerRepository;
 import com.github.siberianintegrationsystems.restApp.data.JournalRepository;
 import com.github.siberianintegrationsystems.restApp.data.QuestionRepository;
+import com.github.siberianintegrationsystems.restApp.data.SessionEventRepository;
 import com.github.siberianintegrationsystems.restApp.entity.BaseEntity;
 import com.github.siberianintegrationsystems.restApp.entity.Journal;
 import org.springframework.stereotype.Service;
@@ -20,17 +22,20 @@ import java.util.stream.Collectors;
 public class JournalServiceImpl implements JournalService {
 
     public static final String QUESTIONS_JOURNAL_ID = "questions";
+    public static final String SESSIONS_JOURNAL_ID = "sessions";
 
     private final JournalRepository journalRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
+    private final SessionEventRepository sessionEventRepository;
 
     public JournalServiceImpl(JournalRepository journalRepository,
                               QuestionRepository questionRepository,
-                              AnswerRepository answerRepository) {
+                              AnswerRepository answerRepository, SessionEventRepository sessionEventRepository) {
         this.journalRepository = journalRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.sessionEventRepository = sessionEventRepository;
     }
 
     @Override
@@ -45,6 +50,7 @@ public class JournalServiceImpl implements JournalService {
         List<? extends JournalItemDTO> collection;
         switch (id) {
             case QUESTIONS_JOURNAL_ID:
+                //список  вопросов
                 collection = getCollection(
                         req.search,
                         questionRepository::findByNameContainingIgnoreCase,
@@ -53,14 +59,14 @@ public class JournalServiceImpl implements JournalService {
                                 answerRepository.findByQuestion(q)));
                 break;
 
-            case "else":
+            case SESSIONS_JOURNAL_ID:
+                //список сессий
                 collection = getCollection(
                         req.search,
-                        questionRepository::findByNameContainingIgnoreCase,
-                        q -> new QuestionsItemDTO(
-                                q,
-                                answerRepository.findByQuestion(q)));
+                        sessionEventRepository::findByNameContainingIgnoreCase,
+                        SessionItemDTO::new);
                 break;
+
             default:
                 throw new RuntimeException();
         }

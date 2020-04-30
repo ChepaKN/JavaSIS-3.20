@@ -1,4 +1,4 @@
-package com.github.siberianintegrationsystems.restApp.controller.dto;
+package com.github.siberianintegrationsystems.restApp.controller.dto.journal;
 
 public class JournalRequestDTO {
     public String search;

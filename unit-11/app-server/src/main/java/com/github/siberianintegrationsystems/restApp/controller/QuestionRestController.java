@@ -19,4 +19,9 @@ public class QuestionRestController {
     public QuestionsItemDTO create(@RequestBody QuestionsItemDTO dto) {
         return questionService.createQuestion(dto);
     }
+
+    @PutMapping("edit")
+    public QuestionsItemDTO edit(@RequestBody QuestionsItemDTO dto){
+        return questionService.editQuestion(dto);
+    }
 }
