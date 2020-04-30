@@ -40,7 +40,6 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public QuestionsItemDTO createQuestion(QuestionsItemDTO dto) {
 
-        //Указал ли клиет верный ответ
         checkAnswersForQuestion(dto);
 
         Question question = new Question();
@@ -62,7 +61,6 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public QuestionsItemDTO editQuestion(QuestionsItemDTO dto){
 
-        //Указал ли клиет верный ответ
         checkAnswersForQuestion(dto);
 
         //Найдем вопрос с таким ID

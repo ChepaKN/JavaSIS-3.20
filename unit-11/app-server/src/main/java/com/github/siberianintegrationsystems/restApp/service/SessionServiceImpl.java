@@ -58,9 +58,9 @@ public class SessionServiceImpl implements SessionService {
                 .count();
 
         //верно выбранных
-        double selectedRightCount = 0;
+        double rightSelectedCount = 0;
         //неверно выбранных
-        double selectedWrongCount = 0;
+        double wrongSelectedCount = 0;
         List<AnswerSessionDTO> selectedAnswers = questionSessionDTO.answersList;
 
         for(AnswerSessionDTO selectedAns : selectedAnswers){
@@ -70,9 +70,9 @@ public class SessionServiceImpl implements SessionService {
 
             if(selectedAns.isSelected){
                 if(savedAns.getCorrect()){
-                    selectedRightCount++;
+                    rightSelectedCount++;
                 }else{
-                    selectedWrongCount++;
+                    wrongSelectedCount++;
                 }
             }
         }
@@ -80,15 +80,20 @@ public class SessionServiceImpl implements SessionService {
         double result;
         //Для избежания деления на 0, если вдруг все ответы верные
         if(answersCount == rightAnswersCount){
-            result = Math.max(0, selectedRightCount/rightAnswersCount - selectedWrongCount);
+            result = Math.max(0, rightSelectedCount/rightAnswersCount - wrongSelectedCount);
         }else{
-            result=  Math.max(0, selectedRightCount/rightAnswersCount - selectedWrongCount/(answersCount-rightAnswersCount));
+            result=  Math.max(0, rightSelectedCount/rightAnswersCount - wrongSelectedCount/(answersCount-rightAnswersCount));
         }
         return result;
     }
 
     @Override
     public String validateSession(SessionDTO sessionDTO){
+
+        //Вдруг с клиента прилетела пустая сессия (без вопросов)
+        if(sessionDTO.questionsList.isEmpty()){
+            throw new RuntimeException("В сохраняемой сессии нет ни одного вопроса!");
+        }
 
         Double result = sessionDTO.questionsList.stream()
                 .map(this::validateOneQuestion).reduce(0.0, Double::sum);
